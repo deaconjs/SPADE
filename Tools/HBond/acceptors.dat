@@ -1,0 +1,16 @@
+# Acceptors description file (comma separated)
+# Format:
+# Amino Acid Name, A, AA
+#
+*,O,C
+BACKBONE,O,C
+ASP,OD1,CG
+ASP,OD2,CG
+GLU,OE1,CD
+GLU,OE2,CD
+MET,SD,CE
+ASN,OD1,CG
+GLN,OE1,CD
+SER,OG,CB
+THR,OG1,CB
+TYR,OH,CZ

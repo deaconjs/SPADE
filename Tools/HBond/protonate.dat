@@ -1,0 +1,24 @@
+# Protonation description file (comma separated)
+# Format:
+# AA Name,D,DD1,DD2,DDD1,DDD2,Hybridization,Bonds,D-H distance,Angles
+#
+# sp2, 1H
+ARG,NE,CD,CZ,None,None,sp2,1H 2DD,1.00,DD1-D-H = DD2-D-H
+TRP,NE1,CD1,CE2,None,None,sp2,1H 2DD,1.00,DD1-D-H = DD2-D-H
+BACKBONE,N,CA,C,None,None,sp2,1H 2DD,1.00,(C-N-H)-(CA-N-H)=4; C CA N H are planar
+TYR,OH,CZ,None,CE2,CE1,sp2,1H 1DD,1.00,DD-D-H = 110 or 250; DD1 DD2 D H are planar
+# sp2, 2H
+ASN,ND2,CG,None,OD1,CB,sp2,2H 1DD,1.00,DD-D-H=120; DDD-DD-D-H=0 or 180
+GLN,NE2,CD,None,OE1,CG,sp2,2H 1DD,1.00,DD-D-H=120; DDD-DD-D-H=0 or 180
+ARG,NH1,CZ,None,NE,NH2,sp2,2H 1DD,1.00,DD-D-H=120; DDD-DD-D-H=0 or 180
+ARG,NH2,CZ,None,NE,NH1,sp2,2H 1DD,1.00,DD-D-H=120; DDD-DD-D-H=0 or 180
+# sp3, 1H
+CYS,SG,CB,None,CA,None,sp3,1H 1DD,1.33,DD-D-H=96
+SER,OG,CB,None,CA,None,sp3,1H 1DD,1.00,DD-D-H=110
+THR,OG1,CB,None,CA,None,sp3,1H 1DD,1.00,DD-D-H=110
+ARG,CA,CB,None,CG,None,sp3,1H 1DD,1.00,DD-D-H=110; Circle Angle=240
+# sp3, 3H
+LYS,NZ,CE,None,CD,None,sp3,3H 1DD,1.01,DD-D-H=110; DDD-D-D-H=180
+N-TERMINUS,N,CA,None,CB,C,sp3,3H 1DD,1.01,DD-D-H=110; DDD-D-D-H=180
+# Special cases
+HOH,O,None,None,None,None,sp3,2H,0.958,H-D-H=104.5

@@ -1,0 +1,35 @@
+# Donors description file (comma separated)
+# Format:
+# AA Donor Name, Donor Atom Name
+#
+ARG,NE
+TRP,NE1
+TYR,OH
+ASN,ND2
+GLN,NE2
+ARG,NH1
+ARG,NH2
+CYS,SG
+SER,OG
+THR,OG1
+LYS,NZ
+N-TERMINUS,N
+ALA,N
+CYS,N
+ASP,N
+GLU,N
+PHE,N
+GLY,N
+HIS,N
+ILE,N
+LYS,N
+LEU,N
+MET,N
+ASN,N
+GLN,N
+ARG,N
+SER,N
+THR,N
+VAL,N
+TRP,N
+TYR,N

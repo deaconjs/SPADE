@@ -1,0 +1,10 @@
+(lp0
+S'1900 Angiotensin II'
+p1
+aS'8200 Insulin'
+p2
+aS'1045 Angiotensin I'
+p3
+aS'6090 unk'
+p4
+a.
