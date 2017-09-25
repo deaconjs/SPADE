@@ -6,7 +6,6 @@ from MolecularComponents.classPoint import Point
 from MolecularComponents.classFutamuraHash import FutamuraHash
 import string
 import math
-import Numeric
 import parms
 verbose = 0
 import copy

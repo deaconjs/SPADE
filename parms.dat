@@ -1,0 +1,96 @@
+parms_list = {
+    ## some graphics
+    'colorblind':0,
+    'chain_colors':[[0.25,0.25,0.90],[0.90,0.90,0.25],[0.90,0.25,0.25],
+                    [0.25,0.90,0.25],[0.25,0.90,0.90],[0.90,0.25,0.90],
+                    [0.05,0.05,0.50],[0.50,0.50,0.05],[0.50,0.05,0.05],
+                    [0.05,0.50,0.05],[0.05,0.50,0.50],[0.50,0.05,0.50]],
+
+    'colorblind_chain_colors':[[0.15,0.15,0.80],[0.80,0.80,0.15],[0.15,0.80,0.15],
+                               [0.00,0.00,0.50],[0.50,0.50,0.00],[0.00,0.50,0.00],
+                               [0.55,0.55,0.99],[0.99,0.99,0.55],[0.55,0.99,0.55],
+                               [0.35,0.35,0.90],[0.90,0.90,0.35],[0.35,0.90,0.35]],
+
+    'atom_color_list':['chain1','chain2','chain3','chain4','chain5','chain6',
+                       'chain7','chain8','chain9','chain10','chain11','chain12',
+                       'white', 'blue', 'red','orange','yellow','cyan','magenta', 'grey'],
+
+    # the first twelve have to be guaranteed, for the chain colors to cycle through
+    'colormap':{ 'chain1':[0.25,0.25,0.90], 'chain2':[0.90,0.90,0.25], 'chain3':[0.90,0.25,0.25],
+                 'chain4':[0.25,0.90,0.25], 'chain5':[0.25,0.90,0.90], 'chain6':[0.90,0.25,0.90],
+                 'chain7':[0.05,0.05,0.50], 'chain8':[0.50,0.50,0.05], 'chain9':[0.50,0.05,0.05],
+                'chain10':[0.05,0.50,0.05],'chain11':[0.05,0.50,0.50],'chain12':[0.50,0.05,0.50],
+                  'white':[1.00,1.00,1.00],   'blue':[0.00,0.00,1.00],    'red':[1.00,0.00,0.00],
+                 'orange':[1,0.5,0],        'yellow':[1,1,0],            'cyan':[0,1,1],
+                'magenta':[1.0,0.0,0.5],      'grey':[0.8,0.8,0.8]},
+
+    'colorblind_colormap':{'chain1':[0.15,0.15,0.80],'chain2':[0.80,0.80,0.15],'chain3':[0.15,0.80,0.15],
+                           'chain4':[0.00,0.00,0.50],'chain5':[0.50,0.50,0.00],'chain6':[0.00,0.50,0.00],
+                           'chain7':[0.55,0.55,0.99],'chain8':[0.99,0.99,0.55],'chain7':[0.55,0.99,0.55],
+                           'chain10':[0.35,0.35,0.90],'chain11':[0.90,0.90,0.35],'chain12':[0.35,0.90,0.35],
+                           'white':[1,1,1],   'blue':[0,0,1],  'red':[0,1,1],
+                           'orange':[1,1,0],'yellow':[1,1,0],'cyan':[0,1,1],
+                           'magenta':[0,0,0.3], 'grey':[0.8,0.8,0.8]},
+
+    # graphics options
+    'graphics_transparency': 1.0,
+    'graphics_quality':30,
+    'graphics_contours':0.20,
+    
+    ## 3-letter types recognized by Bliss
+    'AATypes':["ALA",
+                "CYS", "CYD", "CYZ", "CYX",             # all cystine
+                "ASP", "GLU", "PHE", "GLY",
+                "HIS", "HID", "HIE",
+                "ILE", "LEU", "LYS", "MET", "ASN", "PRO", "GLN",
+                "ARG", "SER", "THR", "VAL", "TRP", "TYR"],
+    'NUCTypes':["  A", "  C", "  G", "  T", "  U"],
+    'WATTypes':["HOH", "WAT", "H2O", "IP3", "SOL"],
+    
+    ## graphics
+    'deselected_opacity':0.05,
+
+    ## the following parameters are used in ModificationViewer
+    'global_x_scale':1,
+    # defaults for MS axes
+    'x_axis_mark_every':50,
+    'y_axis_mark_every':10,
+    'label_font_size':7,
+    # for window smoothing
+    'smoothing_gap':0,
+    # defaults for standards selection
+    'standard_options_parm_scaler':10,
+    'minimum_width_of_low_region':250,
+    'max_height_for_boxing':2.0,
+    'box_distance_from_peak':100,
+    # defaults for analysis selection
+    'analysis_options_parm_scaler':10,
+    'min_weight':800,           # the starting point for identifying peaks... nothing smaller is recognized
+    'min_peak_height':1.0,
+    'height_thresh':1.0,
+    'svsl_peak_thresh':0.5,
+    # if true the mini-viewer plots are scaled 
+    'scale_mini_plots':1,
+            #ScopDomainViewer
+    'gifs_dir': "C:\\CourseWork\\CS499\\MyTest\\",
+    'pdb_dir': "C:\\CourseWork\\CS499\\MyTest\\SCOP_Pdbs\\",
+    'profilesPath': "C:\\CourseWork\\CS499\\MyTest\\SCOPSearchProfiles\\",
+    'scopClassification': "C:\\CourseWork\\CS499\\MyTest\\dir.cla.scop.txt_1.65.txt",
+    'scopDescription': "C:\\CourseWork\\CS499\\MyTest\\dir.des.scop.txt_1.65.txt",
+    'scopHierarchy': "C:\\CourseWork\\CS499\\MyTest\\dir.hie.scop.txt_1.65.txt",
+    'dirNamesDonotIncludelist': ['(', ')', ':', '-', '.', ',', ';', '\\', '/', '"', '\'', '`', '&', '@', '!'],
+    'scopComments': "C:\\CourseWork\\CS499\\MyTest\\dir.com.scop.txt_1.65.txt",
+
+#        'scopClassification': "C:\\CourseWork\\CS499\\MyTest\\clatest.txt",
+#        'scopDescription': "C:\\CourseWork\\CS499\\MyTest\\destest.txt",
+#        'scopHierarchy': "C:\\CourseWork\\CS499\\MyTest\\hietest.txt",
+#   Donot Change the order
+    'nameHierarchy': {'cl':1, 'cf':2, 'sf':3, 'fa':4, 'dm':5, 'sp':6, 'px':7, '':0},
+    #'nameHierarchy': {'cl':0, 'cf':1, 'sf':2, 'fa':3, 'dm':4, 'sp':5, 'px':6, '':0},
+    'scopPDBsLocation': "D:\\pdbstyle-1.65-1\\pdbstyle-1.65\\",
+    #ScopSearch
+    'keywordsFile':"C:\\CourseWork\\CS499\\MyTest\\SCOPSearchProfiles\\keywords.ini",
+    'saveResultsin':"C:\\CourseWork\\CS499\\MyTest\\SCOPSearchProfiles\\CurrentSearchResults\\",
+    'classifications': ['cl', 'cf', 'sf', 'fa', 'dm', 'sp', 'px'],
+    'classifications_fullname': {'cl': 'Class', 'cf': 'Fold', 'sf': 'Superfamily', 'fa': 'Family', 'dm': 'Protein', 'sp': 'Species', 'px': 'Domain'},
+    }

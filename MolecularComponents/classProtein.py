@@ -3,7 +3,7 @@ import os
 import string
 import parms
 import copy
-import Numeric
+import numpy
 import math
 import random
 import re
@@ -233,7 +233,7 @@ class Protein(Polymer):
     def fill_neighbors_lists(self, qscore=0.35, dist_thresh=10.0, force_rewrite=0):
         # first see if the contacts file has been previously generated
         s = len(self.residues)
-        contact_list = Numeric.zeros([s,s], Numeric.Float)
+        contact_list = numpy.zeros([s,s])
         create_new = 0
         filename = self.parent.get_filename_by_extension('.ctc', self.chain_name)
         if force_rewrite:
@@ -246,17 +246,17 @@ class Protein(Polymer):
         if create_new:
             # initialize the contacts list
             # initialize a 2D array to hold inter-sidechain distances
-            distance_list = Numeric.zeros([s,s], Numeric.Float)
+            distance_list = numpy.zeros([s,s])
             for rex in range(len(self.residues)):
                 for rex2 in range(rex,len(self.residues)):
                     if rex != rex2:
                         distance_list[rex][rex2] = self.residues[rex].pseudo_sidechain.dist(self.residues[rex2].pseudo_sidechain)
             print 'sorting distance list'
             # now sort the lists -- first create a new 2D array
-            sorted_list = Numeric.zeros([s,s])
+            sorted_list = numpy.zeros([s,s])
             for rex in range(len(self.residues)):
                 print '.',
-                taken = Numeric.zeros([s])
+                taken = numpy.zeros([s])
                 for rex2 in range(len(self.residues)):
                     minDist = 100.0
                     if rex != rex2:

@@ -1,0 +1,2 @@
+
+testing chain A pdb /home/deaconjs/Desktop/Projects/SPADE/SPADE/Systems/2h4f/2h4f.pdb

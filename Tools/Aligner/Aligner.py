@@ -1,4 +1,4 @@
-import Numeric
+import numpy
 import math
 
 class Aligner:
@@ -80,9 +80,9 @@ class Aligner:
             N = len(self.target.residues)+2
             
         Max=xMax=yMax=0
-        x_traceback = Numeric.zeros((N, N))-1         # initialize to -1
-        y_traceback = Numeric.zeros((N, N))-1
-        score_table = Numeric.zeros((N, N), Numeric.Float)
+        x_traceback = numpy.full(((N, N),-1), dytpe=numpy.int)         # initialize to -1
+        y_traceback = numpy.full(((N, N),-1), dtype=numpy.int)
+        score_table = numpy.zeros((N, N))
         aout = []
         bout = []
         for i in range(N*2):

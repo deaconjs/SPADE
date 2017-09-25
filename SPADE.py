@@ -22,20 +22,21 @@ sys.path.append('./Tools/ConservationTools')
 import ConservationTools
 import DatabaseDomainViewer
 import DatabaseHandlers
-sys.path.append('./Applications/Modification')
-import ModificationViewer
+#sys.path.append('./Applications/Modification')
+#import ModificationViewer
 sys.path.append('./Applications/AlignmentEditor')
-import TreeSystem
-sys.path.append('./Applications/Dynamics')
-import DynamicsViewer
+#import TreeSystem
+#sys.path.append('./Applications/Dynamics')
+#import DynamicsViewer
 
 def load_application(parent, app, selected_title, active_window, active_window_key, chain=None):
     if app == 'Modification':
         reload(ModificationViewer)
         #modification_system = MolecularSystem.ModificationSystem(self.item)
-        CM_viewer = ModificationViewer.CMViewer(systems[active_window_key], 
-                                                active_window.application_pages[selected_title],
-                                                active_window.viewer)
+        pass
+        #CM_viewer = ModificationViewer.CMViewer(systems[active_window_key], 
+        #                                        active_window.application_pages[selected_title],
+        #                                        active_window.viewer)
     elif app == 'AlignmentEditor':
         print 'loading alignment editor for chain %s'%(chain)
         reload(TreeSystem)

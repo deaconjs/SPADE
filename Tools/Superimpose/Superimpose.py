@@ -9,7 +9,6 @@ from operator import xor
 
 sys.path.append('../..')
 import MolecularSystem
-import Numeric
 
 def multi_superimpose(systems):
     # first calculate inter-alpha-carbon distances

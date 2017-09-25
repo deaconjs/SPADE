@@ -1,4 +1,3 @@
-import Numeric
 import math
 import sys
 import copy

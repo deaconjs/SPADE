@@ -12,9 +12,8 @@ import tkFileDialog
 import Pmw
 # module imports
 sys.path.append('./Applications/AlignmentEditor')
-import TreeSystem
-sys.path.append('./Applications/Dynamics')
-import DynamicsViewer
+#sys.path.append('./Applications/Dynamics')
+#import DynamicsViewer
 sys.path.append('./Tools/Selection')
 import SystemSelectionDialog
 
@@ -154,9 +153,9 @@ class SystemCard(Card):
         self.title = Label(self, height=1, width=6, text=name_string)
         self.title.pack(side=LEFT, anchor=W, expand=NO)
         
-    def view_MD(self):
-        reload(DynamicsViewer)
-        self.MD_viewer = DynamicsViewer.MDViewer(self.item)
+    #def view_MD(self):
+    #    reload(DynamicsViewer)
+    #    self.MD_viewer = DynamicsViewer.MDViewer(self.item)
     
     def launch_selection_dialog(self):
         reload(SystemSelectionDialog)
