@@ -9,7 +9,7 @@ I will get some Applications, Databases, and Systems up soon.
 
 ##### Linux:
 
-SPADE requires python-tk, python-vtk, python-pmw, python-numpy, and python-scipy. 
+SPADE requires build-essential, python-tk, python-vtk, python-pmw, python-numpy, and python-scipy. I installed all those on linux mint with apt-get. Then install biopython with "sudo pip install biopython".
 
 [Here](https://danieleriksson.net/2017/02/08/how-to-install-latest-python-on-centos/) are instructions for setting up a good Python build on CentOS/RH. Similar installs will work on other Linux flavors. 
 
