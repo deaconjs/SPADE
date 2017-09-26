@@ -204,7 +204,8 @@ class ApplicationBox:
         self.applications_listbox.pack(side=TOP,expand=1,fill='both', anchor=N)
         self.applications_available = os.listdir('./Applications')
         for application in self.applications_available:
-            self.applications_listbox.insert('end', '%s'%(application))
+            if not application.startswith("README"):
+                self.applications_listbox.insert('end', '%s'%(application))
         self.active_window_key = None
             
     def select_target_system(self, event=None):
@@ -378,7 +379,9 @@ class ObjectBox:
         # systems_not_loaded is a list of directories in the Systems directory
         self.systems_not_loaded = []
         path = os.path.join(os.getcwd(), self.systems_directory)
-        self.systems_not_loaded = os.listdir(path)
+        for potential_system in os.listdir(path):
+            if not potential_system.startswith('README'):
+                self.systems_not_loaded.append(potential_system)
         # system_filenames gets all of these filenames
         for sys_file in self.systems_not_loaded:
             for system_key in systems.keys():
