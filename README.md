@@ -9,7 +9,7 @@ I will get some Applications, Databases, and Systems up soon.
 
 ##### Linux:
 
-SPADE requires python-tk, python-vtk, python-numpy, and python-scipy. 
+SPADE requires python-tk, python-vtk, python-pmw, python-numpy, and python-scipy. 
 
 [Here](https://danieleriksson.net/2017/02/08/how-to-install-latest-python-on-centos/) are instructions for setting up a good Python build on CentOS/RH. Similar installs will work on other Linux flavors. 
 
