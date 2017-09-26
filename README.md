@@ -15,4 +15,4 @@ SPADE requires python-tk, python-vtk, python-numpy, and python-scipy.
 
 ##### Windows:
 
-Windows installer [here](https://sourceforge.net/projects/spade/).
+Windows installer [here](https://sourceforge.net/projects/spade/). This version has limited functionality.
