@@ -25,7 +25,7 @@ import DatabaseHandlers
 #sys.path.append('./Applications/Modification')
 #import ModificationViewer
 sys.path.append('./Applications/AlignmentEditor')
-#import TreeSystem
+import TreeSystem
 #sys.path.append('./Applications/Dynamics')
 #import DynamicsViewer
 
@@ -38,7 +38,7 @@ def load_application(parent, app, selected_title, active_window, active_window_k
         #                                        active_window.application_pages[selected_title],
         #                                        active_window.viewer)
     elif app == 'AlignmentEditor':
-        print 'loading alignment editor for chain %s'%(chain)
+        print 'loading Alignment Editor for chain %s'%(chain)
         reload(TreeSystem)
         window = active_window.application_pages[selected_title]
         viewer = active_window.viewer
