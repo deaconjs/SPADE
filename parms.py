@@ -4,7 +4,7 @@ import string
 
 
 peakrec_fraction = 2
-home_dir = '/home/deaconjs/Desktop/Projects/SPADE/SPADE/'
+home_dir = '/home/deaconjs/Desktop/SPADE/'
 
 parms_dat = os.path.join(home_dir, 'parms.dat')
 
