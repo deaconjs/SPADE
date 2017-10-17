@@ -974,7 +974,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
             through the Protein object's calculate_conservation function
         """
         for pchain in self.system.ProteinList:
-            pchain.fetch_msq_conservation()
+            ConservationTools.fetch_msq_conservation(pchain)
         ConservationTools.calculate_conservation(self.system)
         self.rebuild_color_menu()
 

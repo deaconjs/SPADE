@@ -136,6 +136,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
         try:
             pchain.residues[0].data['conservation']
         except KeyError:
+            print "no key conservation found in pchain %s"%(pchain.chain_name)
             continue
 
         use_asa = 0

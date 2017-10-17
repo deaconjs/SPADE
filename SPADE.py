@@ -288,6 +288,10 @@ class ApplicationBox:
         if keys[0] == 'AlignmentEditor':
             active_window = spade.ui.system_windows[self.active_window_key]
             for pchain in systems[self.active_window_key].ProteinList:
+                pchain_seq = pchain.get_sequence()
+                if len(pchain_seq) < 40:
+                    print "skipping load application on chain %s, len %s %s"%(pchain.chain_name, len(pchain_seq), pchain_seq)
+                    continue
                 selected_title = 'AlignmentEditor %s'%(pchain.chain_name)
                 active_window.application_pages[selected_title] = active_window.application_notebook.add(selected_title)
                 active_window.pw.configurepane('info', size=0.5)    # default sizes
