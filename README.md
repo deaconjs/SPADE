@@ -4,7 +4,7 @@
 [sites.google.com/view/spade](sites.google.com/view/spade)
 
 
-##### Linux:
+#### Linux:
 
 ##### Install SPADE
 
@@ -25,6 +25,6 @@ $ python MolecularViewer.py
 Close SPADE then cd into the Applications folder. Clone the AlignmentEditor github repo into a folder named AlignmentEditor. Then start SPADE.
 
 
-##### Windows:
+#### Windows:
 
 Windows installer [here](https://sourceforge.net/projects/spade/). This version has limited functionality.
