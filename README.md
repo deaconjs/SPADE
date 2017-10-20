@@ -1,7 +1,7 @@
 ### SPADE
 #### Structural Proteomics Application Development Environment 
 
-[https://sites.google.com/view/spade](sites.google.com/view/spade)
+[sites.google.com/view/spade](https://sites.google.com/view/spade)
 
 
 #### Linux:
