@@ -936,11 +936,11 @@ class MolecularViewer(Frame):             # Molecular Viewer
         self.rebuild_color_menu()
         
     def calculate_conservation(self):
-        """ currently designed to read Molnir .msq files,
-            through the Protein object's calculate_conservation function
+        """ reads each chain's Molnir .msq or ClustalW .aln alignment,
+            then scores conservation through ConservationTools
         """
         for pchain in self.system.ProteinList:
-            ConservationTools.fetch_msq_conservation(pchain)
+            ConservationTools.fetch_conservation(pchain)
         ConservationTools.calculate_conservation(self.system)
         self.rebuild_color_menu()
 

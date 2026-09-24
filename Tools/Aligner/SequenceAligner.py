@@ -30,7 +30,7 @@ class SequenceAligner(Aligner.Aligner):
                                 'AW': 2/15.0, 'RW': 9/15.0, 'NW': 2/15.0, 'DW': 1/15.0, 'CW':10/15.0, 'QW': 4/15.0, 'EW': 1/15.0, 'GW': 7/15.0, 'HW': 4/15.0, 'IW': 3/15.0, 'LW': 6/15.0, 'KW': 4/15.0, 'MW': 4/15.0, 'FW': 7/15.0, 'PW': 2/15.0, 'SW': 5/15.0, 'TW': 3/15.0, 'WW':15/15.0, 'Y-': 6/15.0,
                                 'AY': 3/15.0, 'RY': 5/15.0, 'NY': 8/15.0, 'DY': 6/15.0, 'CY':12/15.0, 'QY': 6/15.0, 'EY': 3/15.0, 'GY': 2/15.0, 'HY':14/15.0, 'IY': 5/15.0, 'LY': 6/15.0, 'KY': 3/15.0, 'MY': 4/15.0, 'FY':15/15.0, 'PY': 3/15.0, 'SY': 7/15.0, 'TY': 4/15.0, 'WY': 8/15.0, 'YY':15/15.0, 'V-': 6/15.0,
                                 'AV':11/15.0, 'RV': 4/15.0, 'NV': 5/15.0, 'DV': 5/15.0, 'CV': 7/15.0, 'QV': 4/15.0, 'EV': 5/15.0, 'GV': 6/15.0, 'HV': 4/15.0, 'IV':15/15.0, 'LV':11/15.0, 'KV': 4/15.0, 'MV':12/15.0, 'FV': 8/15.0, 'PV': 7/15.0, 'SV': 7/15.0, 'TV':10/15.0, 'WV': 4/15.0, 'YV': 4/15.0, 'VV':15/15.0}
-        for key in self.scoring_matrix.keys():
+        for key in list(self.scoring_matrix.keys()):
             if key[1]+key[0] not in self.scoring_matrix.keys():
                 self.scoring_matrix[key[1]+key[0]] = self.scoring_matrix[key[0]+key[1]]
 

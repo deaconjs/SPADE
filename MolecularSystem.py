@@ -975,7 +975,7 @@ class System:
             print(line)
             outfile.write(line+'\n')
             if 'normalized_0D_conservation' not in pchain.residues[0].features:
-                line = f"no conservation scores for chain {pchain.chain_name} (needs an .msq alignment), skipping"
+                line = f"no conservation scores for chain {pchain.chain_name} (needs an .msq or .aln alignment), skipping"
                 print(line)
                 outfile.write(line+'\n')
                 continue

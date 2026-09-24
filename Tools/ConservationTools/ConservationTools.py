@@ -29,6 +29,38 @@ for key in list(scoring_matrix.keys()):
     if key[1]+key[0] not in scoring_matrix:
         scoring_matrix[key[1] + key[0]] = scoring_matrix[key[0] + key[1]]
 
+def fetch_conservation(pchain):
+    """ load the chain's alignment for conservation: a Molnir .msq if present, else a
+        ClustalW aligned-FASTA .aln (first sequence is the query). returns 1 on success.
+    """
+    if fetch_msq_conservation(pchain):
+        return 1
+    return fetch_aln_conservation(pchain)
+
+def fetch_aln_conservation(pchain):
+    """ apply an aligned-FASTA .aln file (as written by Sequencer/SequenceFetcher) """
+    filename = pchain.parent.get_filename_by_extension('.aln', pchain.chain_name)
+    try:
+        aln_file = open(filename)
+    except IOError:
+        print(f"no .aln file present for chain {pchain.chain_name}")
+        return 0
+    sequences = []
+    for block in aln_file.read().split('>')[1:]:
+        sequences.append(''.join(block.split('\n')[1:]).replace(' ', '').upper())
+    aln_file.close()
+    if len(sequences) < 2 or len(set(len(s) for s in sequences)) != 1:
+        print(f"{filename} is not a usable alignment (needs 2+ sequences of equal length)")
+        return 0
+    # one column per query residue, the same shape as the lines of an .msq file
+    query = sequences[0]
+    columns = []
+    for i in range(len(query)):
+        if query[i] != '-':
+            columns.append(''.join([s[i] for s in sequences]))
+    print(f"loaded {len(sequences)}-sequence alignment for chain {pchain.chain_name} from {filename}")
+    return _apply_alignment_columns(pchain, columns)
+
 def fetch_msq_conservation(pchain):
     """ shortcut to apply .msq files as alignments: probably not a permenant function """
     filename = pchain.parent.get_filename_by_extension('.msq', pchain.chain_name)
@@ -39,6 +71,12 @@ def fetch_msq_conservation(pchain):
         return 0
 
     lines = contact_file.readlines()
+    return _apply_alignment_columns(pchain, lines)
+
+def _apply_alignment_columns(pchain, lines):
+    """ lines holds one alignment column per query residue, query residue first. aligns the
+        query to the chain's sequence and stores each column in residue.data['conservation']
+    """
     firstline = ""
     for line in lines:
         if line[0] != '-':
@@ -67,7 +105,7 @@ def fetch_msq_conservation(pchain):
             target_index += 1
         else:
             print("error")
-    return 1 # success -- found an msq file
+    return 1 # success -- alignment applied
 
 def apply_sequence_alignment(system, sequences):
     """ given a set of aligned sequences, where the top corresponds to the query,
@@ -131,8 +169,9 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
         try:
             pchain.residues[0].data['conservation']
         except KeyError:
-            print(f"no key conservation found in pchain {pchain.chain_name}")
-            continue
+            if not fetch_conservation(pchain):
+                print(f"no alignment found for chain {pchain.chain_name}")
+                continue
 
         use_asa = 0
         for res in pchain.residues:
@@ -149,8 +188,8 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
             try:
                 res.data['conservation']
             except KeyError:
-                print("fetching conservation from msqs")
-                cons_test = fetch_msq_conservation(pchain)
+                print("fetching conservation from alignment files")
+                cons_test = fetch_conservation(pchain)
                 break
 
         if not cons_test:
