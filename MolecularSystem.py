@@ -953,7 +953,7 @@ class System:
                 else:
                     res.features['binary_dif_sidechain_asa'] = 0
                     res.data['chain_dif_sidechain_asa'] = 0
-            print
+            print()
 
         asa_style = 'asa'
         for pchain in self.ProteinList:
@@ -974,6 +974,11 @@ class System:
             line = f"testing chain {pchain.chain_name} pdb {self.filename}"
             print(line)
             outfile.write(line+'\n')
+            if 'normalized_0D_conservation' not in pchain.residues[0].features:
+                line = f"no conservation scores for chain {pchain.chain_name} (needs an .msq alignment), skipping"
+                print(line)
+                outfile.write(line+'\n')
+                continue
             total_sum = 0.0
             rui = 0.0
             for res in pchain.residues:
@@ -986,7 +991,7 @@ class System:
                     print(line)
                     outfile.write(line+'\n')
 
-            line = f"{rui} angstroms under interface {pchain.chain_name}"
+            line = f"{rui:5.2f} angstroms under interface {pchain.chain_name}"
             print(line)
             outfile.write(line+'\n')
             
@@ -1028,7 +1033,7 @@ class System:
                         count2 += 1
                     if average >= sum/count2:
                         wins += 1
-                line = f"chain {pchain.chain_name} {token} ({int(count)} residues - {average}) wins {100.0*wins/float(times)} percent of the time"
+                line = f"chain {pchain.chain_name} {token} ({int(count)} residues - {average}) wins {100.0*wins/float(times):4.1f} percent of the time"
                 print(line)
                 outfile.write(line+'\n')
                 total_sum += 100.0*wins/float(times)

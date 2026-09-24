@@ -450,8 +450,8 @@ class MolecularViewer(Frame):             # Molecular Viewer
         # create menu items for .features keys for atoms and residues
         if self.system != 'None' and self.system != None:
             key_store = {}
-            key_store['atom'] = self.system.ProteinList[0].atoms[0].features.keys()
-            key_store['residue'] = self.system.ProteinList[0].residues[0].features.keys()
+            key_store['atom'] = list(self.system.ProteinList[0].atoms[0].features.keys())
+            key_store['residue'] = list(self.system.ProteinList[0].residues[0].features.keys())
             for run_type in ['atom', 'residue']:
                 broken = 0
                 for key in key_store[run_type]:
@@ -569,11 +569,13 @@ class MolecularViewer(Frame):             # Molecular Viewer
         pass
         
     def color_atoms_by_atom_feature(self, pol, feature):
+        # atoms added after the feature was calculated (e.g. hydrogens) have no value; show them as -1
         for atom in pol.atoms:
-            if atom.features[feature] == -1:
+            value = atom.features.get(feature, -1)
+            if value == -1:
                 color = [1.0,0.0,0.0]
             else:
-                color = [0.0+atom.features[feature],  0.0+atom.features[feature], 1.0]
+                color = [0.0+value,  0.0+value, 1.0]
             atom.vtk_arg_list['atoms']['color'] = color
         self.update_view()
 
@@ -583,12 +585,12 @@ class MolecularViewer(Frame):             # Molecular Viewer
             sum_feature = 0.0
             num = 0.0
             for atom in res.atoms:
-                if atom.features[feature] == -1:
+                if atom.features.get(feature, -1) == -1:
                     continue
                 else:
                     sum_feature += atom.features[feature]
                     num += len(res.atoms)
-            averages_list.append(sum_feature/num)
+            averages_list.append(sum_feature/num if num else 0.0)
         # normalize
         maxval = 0.0
         minval = 100000.0
@@ -605,10 +607,11 @@ class MolecularViewer(Frame):             # Molecular Viewer
 
     def color_volume_by_atom_feature(self, pol, feature):
         for atom in pol.atoms:
-            if atom.features[feature] == -1:
+            value = atom.features.get(feature, -1)
+            if value == -1:
                 color = [1.0,0.0,0.0]
             else:
-                color = [0.0+atom.features[feature],  0.0+atom.features[feature], 1.0]
+                color = [0.0+value,  0.0+value, 1.0]
             atom.vtk_arg_list['volume']['color'] = color
         self.update_view()
 
@@ -1273,7 +1276,7 @@ class GraphicsVisitor:
                 if atom.chain_name == wat.chain_name:
                     return colormap[chain_colors[pidx%len(chain_colors)]]
                 pidx = pidx + 1
-        if color in colormap.keys():
+        if isinstance(color, str) and color in colormap:
             return colormap[color]
         else:
             return color

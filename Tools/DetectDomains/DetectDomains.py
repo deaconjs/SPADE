@@ -121,7 +121,7 @@ def auto_decompose(pchain, viewer=None):
             Hscore += hb_dict[res.res_type1]
         cscore = Cscore / (len(res.neighbors)*2)
         hscore = Hscore / (len(res.neighbors)*2)
-        print '%s > %s and %s > %s and %s >= %s'%(len(res.neighbors), (Cavg_factor*Cavg), res.features['shielding'], min_core_sa, hscore, Havg_factor*Havg)
+        print('%s > %s and %s > %s and %s >= %s'%(len(res.neighbors), (Cavg_factor*Cavg), res.features['shielding'], min_core_sa, hscore, Havg_factor*Havg))
         if len(res.neighbors) > (Cavg_factor * Cavg) and res.features['shielding'] > min_core_sa and hscore >= Havg_factor * Havg:
             if secondary_structure_filter and res.features['secondary'] == 'C':
                 continue
@@ -135,7 +135,7 @@ def auto_decompose(pchain, viewer=None):
         j += 1
     if viewer != None:
         viewer.color_atoms_by_residue_feature(pchain, 'shielding')
-        viewer.atoms_display_on()        
+        viewer.display('atoms', 1)
     
     win_counter = 0
     # Pt pt1, pt2
@@ -147,7 +147,7 @@ def auto_decompose(pchain, viewer=None):
     crystal_range_end = 0
 
     # now locate domains
-    while 1:
+    while True:
         start_size = network_start_distance  # 12
         for n in range(avail_core_count):
             pass_counter = 0
@@ -159,7 +159,7 @@ def auto_decompose(pchain, viewer=None):
                     if pass_counter == n+1:
                         start_holder = k
                         break
-            print 'start holder %s'%(start_holder)
+            print('start holder %s'%(start_holder))
             for j in range(start_holder, mstln):
                 j_res = pchain.residues[j]
                 if avail_core_list[j]:
@@ -186,7 +186,7 @@ def auto_decompose(pchain, viewer=None):
                             current_core_count += 1
             if current_core_count >= minimum_crystal_start:
                 break
-        print 'found %s in current core, %s required'%(current_core_count, minimum_crystal_start)
+        print('found %s in current core, %s required'%(current_core_count, minimum_crystal_start))
         if current_core_count < minimum_crystal_start:                              # if a minimum crystal was not found in the search, 
             break
         else:
@@ -208,7 +208,7 @@ def auto_decompose(pchain, viewer=None):
                             atom.vtk_arg_list['atoms']['color'] = [1.0,1.0,0.0]
                 viewer.update_view()
             # finally, extend the crystal
-            while 1:                                                                 # loop until no new residues are added
+            while True:                                                                 # loop until no new residues are added
                 last_avail_core_count = temp_core_count                              # use to monitor whether a residue was added - break later if not
                 for h in range(crystal_range_start, crystal_range_end):              # dont extend beyond the current crystal range
                     hres = pchain.residues[h]
@@ -265,7 +265,7 @@ def auto_decompose(pchain, viewer=None):
     fcr_cntr = 0
     for j in range(number_of_cores):
         ncr_cntr = 0
-        while 1:
+        while True:
             cores[j][ncr_cntr] = full_core_list[fcr_cntr]
             fcr_cntr += 1
             ncr_cntr += 1
@@ -588,7 +588,7 @@ def auto_decompose(pchain, viewer=None):
     #   if its a continuation, merge the cores, else leave it alone
     #   also decipher whether or not two independent domains should be entangled
     selection = 0
-    while 1:
+    while True:
         if not merging:
             break
         reset_button = 0
@@ -936,8 +936,8 @@ def auto_decompose(pchain, viewer=None):
               increment_search = 1
               top_of_search = j
               bot_of_search = j
-              while 1:                                             # add residues to the neighbors
-                  while 1:                                           # first find the next forward residue that belongs to a core
+              while True:                                             # add residues to the neighbors
+                  while True:                                           # first find the next forward residue that belongs to a core
                       top_of_search += 1
                       if top_of_search >= mstln:                       # but break if past the end of the array
                           break
@@ -948,7 +948,7 @@ def auto_decompose(pchain, viewer=None):
                       got_this_many += 1
                   if got_this_many == window_size:
                       break
-                  while 1:                                           # first find the next forward residue that belongs to a core
+                  while True:                                           # first find the next forward residue that belongs to a core
                       bot_of_search -= 1
                       if bot_of_search < 0:                            # but break if past the end of the array
                           break

@@ -145,7 +145,7 @@ def _transform_coordinates(trns, rm, atom_list):
 def __atoms_to_pdb(atomlist, filename, chain_name="A"):
     file = open(filename, 'w')
     for atom in atomlist:
-        
+        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(atom.atom_number,"CA","GLY",chain_name,atom.res_number,atom.x,atom.y,atom.z, " ")
         file.write(line)
     file.close()
 
@@ -153,7 +153,7 @@ def __bucket_to_pdb(bucket, filename, chain_name="A"):
     file = open(filename, 'w')
     for atom_data in bucket:
         x,y,z = atom_data['coordinates'][0], atom_data['coordinates'][1], atom_data['coordinates'][2]
-        line = f"ATOM {atom.atom_number:>6}{'CA':>5} {'GLY':>3} {chain_name:>1}{atom_data['atom_number']:>4} {atom.x:11.3f} {atom.y:7.3f} {atom.z:7.3f}"
+        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(atom_data['atom_number'],"CA","GLY",chain_name,atom_data['atom_number'],x,y,z, " ")
         file.write(line)
     file.close()
         
@@ -162,7 +162,7 @@ def __coor_list_to_pdb(list, filename, chain_name="A"):
     cntr = 1
     for sublist in list:
         x,y,z = sublist[0], sublist[1], sublist[2]
-        line = f"ATOM {cntr:>6}{'CA':>5} {'GLY':>3} {chain_name:>1}{cntr:>4} {x:11.3f} {y:7.3f} {z:7.3f}{' ':>26}"
+        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(cntr,"CA","GLY",chain_name,cntr,x,y,z, " ")
         file.write(line)
         cntr += 1
     file.close()

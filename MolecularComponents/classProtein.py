@@ -252,7 +252,7 @@ class Protein(Polymer):
                         distance_list[rex][rex2] = self.residues[rex].pseudo_sidechain.dist(self.residues[rex2].pseudo_sidechain)
             print("sorting distance list")
             # now sort the lists -- first create a new 2D array
-            sorted_list = numpy.zeros([s,s])
+            sorted_list = numpy.zeros([s,s], dtype=int)
             for rex in range(len(self.residues)):
                 print('.', end='')
                 taken = numpy.zeros([s])
@@ -267,7 +267,7 @@ class Protein(Polymer):
                                     saveK = rex3
                         taken[saveK] = 1
                         sorted_list[rex][rex2] = saveK
-            print
+            print()
             # calculate shielding
             print("calculating shielding")
             for rex in range(len(self.residues)):
@@ -313,7 +313,7 @@ class Protein(Polymer):
             for rex in range(len(self.residues)):
                 write_string = ""
                 for rex2 in range(rex, len(self.residues)):
-                    write_string = write_string + f"{contact_list[rex][rex2]:5.3f}"
+                    write_string = write_string + "%5.3f, "%(contact_list[rex][rex2])
                 write_string = write_string + '\n'
                 if write_string != '\n':
                     contact_file.write(write_string)

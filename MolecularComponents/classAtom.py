@@ -112,15 +112,15 @@ class Atom(Point):
 
     def pdb_print(self):
         if self.res_type in ['WAT', 'HOH', 'H2O', 'IP3']:
-            print(f"HETATM{self.atom_number:>5}{self.atom_type:>5} {self.res_type:>3} {self.chain_name:>1}{self.res_number:>4} {self.x:11.3f} {self.y:7.3f} {self.z:7.3f}{space:>26}")
+            print("HETATM%5d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n"%(self.atom_number,self.atom_type,self.res_type,self.chain_name,self.res_number,self.x,self.y,self.z, " "))
         else:
-            print(f"ATOM {self.atom_number:>6}{self.atom_type:>5} {self.res_type:>3} {self.chain_name:>1}{self.res_number:>4} {self.x:11.3f} {self.y:7.3f} {self.z:7.3f}{space:>26}")
+            print("ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n"%(self.atom_number,self.atom_type,self.res_type,self.chain_name,self.res_number,self.x,self.y,self.z, " "))
 
     def get_pdb_line(self):
         if self.res_type in ['WAT', 'HOH', 'H2O', 'IP3']:
-            return f"HETATM{self.atom_number:>5}{self.atom_type:>5} {self.res_type:>3} {self.chain_name:>1}{self.res_number:>4} {self.x:11.3f} {self.y:7.3f} {self.z:7.3f}{space:>26}"
+            return "HETATM%5d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n"%(self.atom_number,self.atom_type,self.res_type,self.chain_name,self.res_number,self.x,self.y,self.z, " ")
         else:
-            return f"ATOM {self.atom_number:>6}{self.atom_type:>5} {self.res_type:>3} {self.chain_name:>1}{self.res_number:>3} {self.x:11.3f} {self.y:7.3f} {self.z:7.3f}{space:>26}"
+            return "ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n"%(self.atom_number,self.atom_type,self.res_type,self.chain_name,self.res_number,self.x,self.y,self.z, " ")
 
     def select(self):
         self.selected = 1

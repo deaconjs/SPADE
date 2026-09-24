@@ -1,4 +1,3 @@
-import string
 import sys
 sys.path.append('./Tools/Aligner')
 import SequenceAligner
@@ -63,7 +62,7 @@ def fetch_msq_conservation(pchain):
             pchain.residues[target_index].data['conservation'] = ""
             target_index += 1
         elif target_out[i] != '-' and template_out[i] != '-':
-            pchain.residues[target_index].data['conservation'] = string.strip(lines[template_index])
+            pchain.residues[target_index].data['conservation'] = lines[template_index].strip()
             template_index += 1
             target_index += 1
         else:
@@ -74,7 +73,7 @@ def apply_sequence_alignment(system, sequences):
     """ given a set of aligned sequences, where the top corresponds to the query,
         fill conservation features with strings from columns of the input table.
     """
-    first_sequence = string.upper(sequences[0])
+    first_sequence = sequences[0].upper()
     match_sequence = ""
     for c in first_sequence:
         if c in ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']:
@@ -91,7 +90,7 @@ def apply_sequence_alignment(system, sequences):
         rs_index = 0
         
         for fs_ind in range(len(first_sequence)):
-            k = string.upper(first_sequence[fs_ind])
+            k = first_sequence[fs_ind].upper()
             if k in ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']:
                 conservation = ''
                 for seq in sequences:
