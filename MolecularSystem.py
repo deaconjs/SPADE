@@ -787,7 +787,7 @@ class System:
                 print("creating new")
         if create_new:
             sphere_res = 15
-            if self.x_table == None:
+            if self.x_table is None:
                 self.build_futamura_intersection_table(solvent_radius)
             x_table = self.x_table
             for pchain in self.ProteinList:
@@ -866,7 +866,7 @@ class System:
         self.calculate_system_asa(solvent_radius, point_count, forced_rewrite)
         for pchain in self.ProteinList:
             pchain.assign_asa(solvent_radius, point_count, forced_rewrite)
-        if self.x_table == None:
+        if self.x_table is None:
             self.build_futamura_intersection_table(solvent_radius)
         # for chain _ include _ as interface and exclude _ from background
         specs = {'Systems/1a2k/1a2k.pdb':{'A':[['D'], ['B']],

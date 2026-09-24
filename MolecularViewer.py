@@ -2127,7 +2127,7 @@ class GraphicsVisitor:
         
     """  surface calculation  """
     def _get_futamura_surface_points(self, mol, sphere_res, solvent_radius):
-        if mol.x_table == None:
+        if mol.x_table is None:
             mol.build_futamura_intersection_table(solvent_radius)
         x_table = mol.x_table
         radii  = {'C':solvent_radius + 1.75,

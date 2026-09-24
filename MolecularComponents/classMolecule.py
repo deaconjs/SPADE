@@ -365,7 +365,7 @@ class Molecule:
             except IOError:
                 create_new = 1
         if create_new:
-            if self.x_table == None:
+            if self.x_table is None:
                 self.build_futamura_intersection_table(distance_cutoff)
             print("filling densities")
             atom_count = 0.0

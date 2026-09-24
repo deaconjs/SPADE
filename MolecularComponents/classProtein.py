@@ -187,6 +187,7 @@ class Protein(Polymer):
             position if there are no sidechain atoms. type 1 calculates the average coordinate from
             all non-H sidechain atoms. 
         """
+        self.pseudo_sidechain_type = type      # part of the .ctc cache key
         if type == 0:
             for rez_index in range(len(self.residues)):
                 if not self.residues[rez_index].has_central_pt:
@@ -229,19 +230,37 @@ class Protein(Polymer):
                 rez.pseudo_sidechain = Point(stuff[0],stuff[1],stuff[2])
 
 
+    def _read_contacts_file(self, filename, contact_list):
+        """ fill contact_list from a .ctc cache. returns 0 if the file is missing or
+            does not match this chain, so the caller recomputes it """
+        s = len(self.residues)
+        try:
+            contact_file = open(filename)
+        except IOError:
+            return 0
+        rows = [line for line in contact_file.read().split('\n') if line.strip()]
+        contact_file.close()
+        if len(rows) != s:
+            return 0
+        for rex in range(s):
+            tokens = rows[rex].split(',')
+            if len(tokens) != s:
+                return 0
+            for rex2 in range(s):
+                contact_list[rex][rex2] = float(tokens[rex2])
+        return 1
+
     def fill_neighbors_lists(self, qscore=0.35, dist_thresh=10.0, force_rewrite=0):
         # first see if the contacts file has been previously generated
         s = len(self.residues)
         contact_list = numpy.zeros([s,s])
-        create_new = 0
-        filename = self.parent.get_filename_by_extension('.ctc', self.chain_name)
+        # scores depend on the pseudo-sidechain placement and the cut-off, so each pair gets
+        # its own cache, e.g. 1a0oA_p1_d10.ctc
+        filename = self.parent.get_filename_by_extension('.ctc', f"{self.chain_name}_p{getattr(self, 'pseudo_sidechain_type', 1)}_d{dist_thresh:g}")
         if force_rewrite:
             create_new = 1
         else:
-            try:
-                contact_file = open(filename)
-            except IOError:
-                create_new = 1
+            create_new = not self._read_contacts_file(filename, contact_list)
         if create_new:
             # initialize the contacts list
             # initialize a 2D array to hold inter-sidechain distances
@@ -307,27 +326,12 @@ class Protein(Polymer):
                         shielding = shielding * s2
                     # this is the q score
                     contact_list[rex][sorted_list[rex][rex2]] = 20.0 * shielding / (p1b.dist(p2b) + 1.0)
-            # write the contacts to a file
+            # write the contacts to a file. scores are not symmetric, so store the full
+            # matrix, and at full precision so cached runs match fresh ones exactly
             print("done shielding")
             contact_file = open(filename, 'w')
             for rex in range(len(self.residues)):
-                write_string = ""
-                for rex2 in range(rex, len(self.residues)):
-                    write_string = write_string + "%5.3f, "%(contact_list[rex][rex2])
-                write_string = write_string + '\n'
-                if write_string != '\n':
-                    contact_file.write(write_string)
-            contact_file.close()
-        else:           # else read the contacts_file to fill the contact_list
-            for rex in range(len(self.residues)):
-                buffer = contact_file.readline()
-                if len(buffer) == 0:
-                    break
-                tokens = buffer.split(',')
-                token_index = 0
-                for rex2 in range(rex, len(self.residues)):
-                    contact_list[rex][rex2] = 100 * (float(tokens[token_index]))
-                    token_index = token_index + 1
+                contact_file.write(', '.join([repr(float(v)) for v in contact_list[rex]]) + '\n')
             contact_file.close()
         # now fill the neighbors lists
         for rex in range(len(self.residues)):
