@@ -1,0 +1,7 @@
+# VTK binary surface meshes and images must not get line-ending conversion
+*.sms binary
+*.hms binary
+*.bms binary
+*.jpg binary
+*.gif binary
+*.ppm binary

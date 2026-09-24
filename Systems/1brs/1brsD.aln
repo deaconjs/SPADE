@@ -1,0 +1,75 @@
+>gi|QUERY||| Original Sequence
+-------------------------------------------------------------------------------------------KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTG----WVEYPLVLEWRQFES----LT--GAESVLQVFREAKAEG--ADITIILS-----------------------------
+
+>gi|4139783|pdb|1B27|F Chain F, Structural Response To Mutation At A Protein-Protein Interface
+------------------------------------------------------------------------------------------MKKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTG----WVEYPLVLEWRQFEQSKQ-LTENGAESVLQVFREAKAEG--ADITIILS-----------------------------
+
+>gi|30984055|gb|AAP41140.1| barnase inhibitor [Cloning vector pHRBar-6]
+------------------------------------------------------------------------------------------MKKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDCLTG----WVEYPLVLEWRQFEQSKQ-LTENGAESVLQVFREAKAEG--CDITIILS-----------------------------
+
+>gi|52005227|gb|AAU25169.1| putative ribonuclease inhibitor YrdF [Bacillus licheniformis ATCC 14580]
+------------------------------------------------------------------------------------------MKQVTLKGEKIRSVSDLHKELKEQLELPDYYGENLDALWDCLTG----WVGMPLLIEWKNVEKSRI-YLGDQAEAYLQLFREAEETL--DGFQLKTEG----------------------------
+
+>gi|2635118|emb|CAB14614.1| yrdF [Bacillus subtilis subsp. subtilis str. 168]
+------------------------------------------------------------------------------------------MRKIIIDGRDFENIEVLHDDLKDKLDFPDYYGRNLDALWDCLTG----WVDLPLTLVLKNFEFSNT-FLGSYADDVLEVIQEAQEELK-DEFKIIIE-----------------------------
+
+>gi|82746447|ref|ZP_00908953.1| barstar-like protein ribonuclease (barnase) inhibitor [Clostridium beijerincki NCIMB 8052]
+------------------------------------------------------------------------------------------MNKVVIQGSKLTDRNMLHQILKQELKLPAHYGENLDALWDCLTA----DIQLPVTIEWVDFQKSKD-LLGDYAENTLEIFNEAEKFTG-GKLKIKIISNF--------------------------
+
+>gi|15023737|gb|AAK78820.1|AE007600_3 Barstar-like protein ribonuclease (barnase) inhibitor [Clostridium acetobutylicum ATCC 824]
+------------------------------------------------------------------------------------------MKIVTIDGKEFKDKDNLHRILKKELKFPEYYGKNLDALWDCLTG----ETKMPLKIVWKNFNDSKG-YLGQYAERTAQVLLRVEEYFN-GKFKVEIQ-----------------------------
+
+>gi|67661635|ref|ZP_00458927.1| Barstar (barnase inhibitor) [Burkholderia cenocepacia HI2424]
+---------------------------------------------------------------------------------------MARDTRVEIELDDIESTEQLHVRLMKKLSFPDWYGRNWDAFWDAITA----LVDMPPILRLKGWSEFERRFPRD-AKLMRDCLQDMARQY--PAFAPRVEYD---------------------------
+
+>gi|25986880|gb|AAN16065.1| possible ribonuclease inhibitor [Pseudomonas stutzeri]
+---------------------------------------------------------------------------------------MSRVQLVEVDLRVITSAEELHSLLMESLNFPGWYGANWDAFWDAITG----LVEMPSTVRFLGWAQFSQRLPRD-AVLLKECLTEMQGQY--PQFASEVVYV---------------------------
+
+>gi|68344049|gb|AAY91655.1| possible ribonuclease inhibitor [Pseudomonas fluorescens Pf-5]
+---------------------------------------------------------------------------------------MSRLPLQHIDLSQVTSTAELHLVLRDALGFPHWYGCNWDAFWDAITG----LVEMPEQLHISGWQALSRRLPRD-AQLLLQCLERMKVQY--PTLAADLLLEPAKP-----------------------
+
+>gi|46164302|ref|ZP_00205037.1| COG2732: Barstar, RNAse (barnase) inhibitor [Pseudomonas aeruginosa UCBPP-PA14]
+-----------------------------------------------------------------------------------MDEELNRAASLAIELADVDSAARLHERLREALALPPWYGCNWDAFWDAISG----LVPMPRRLRLQGWSDFARRLPEE-AAQLSACLEALRETY--PQLAPEVLRDA--------------------------
+
+>gi|15021272|emb|CAC44713.1| putative ribonuclease inhibitor [Streptomyces coelicolor A3(2)]
+--------------------------------------------------------------------------------------------MITIDVSEVTDERTLHVLLKRELGFPDFYGMNWDAFWDSITG----LVSIPTHVRFVGWDQLAAGVPRG-AAMLRRALDDYQATYR-PEFFAQYA-----------------------------
+
+>gi|87119226|ref|ZP_01075124.1| possible ribonuclease inhibitor [Marinomonas sp. MED121]
+---------------------------------------------------------------------------------------------MNIDLSKITTERELHELLARCLSFPSFYGQNWDAFWDSISD----LVSLPEKIIFTGSSALKDRLPSS-YEQLKNCFNELAEER--PDINCAVYWE---------------------------
+
+>gi|89092926|ref|ZP_01165878.1| hypothetical protein MED92_10709 [Oceanospirillum sp. MED92]
+-----------------------------------------------------------------------------------------MEEQLLIDVSGIMDEETFHEYISKKLGFPGYYGFNLNALWDCITDED--QSSMPRVLIVEGLAALNSFLPEL-HDGFVQCLSDYLKEF--PDRKVIMRQNSPSGEGIEFENE---------------
+
+>gi|77954367|ref|ZP_00818763.1| ribonuclease inhibitor barstar [Marinobacter aquaeolei VT8]
+-------------------------------------------------------------------------------------------MRVVMNGREILSEADFHNKISEAMNFPSYYGKNLDALWDVLST----DIERPVTLVWENADSSKESMGDS-FAKIVDLLNRVMAQ-D-EEWGLDERFEVVIG-----------------------
+
+>gi|7225873|gb|AAF41067.1| ribonuclease inhibitor barstar [Neisseria meningitidis MC58]
+-------------------------------------------------------------------------------------------MQLEIIGSKIYTEQDFHNQISKIFSIQDYYGNNLDALWDLLST----NVERPITLVWKDAMFSKNQLENI-FIEIVNVLERVKKQ-D-EDYGFEEKFNYILE-----------------------
+
+>gi|78195069|gb|ABB32836.1| Barstar [Geobacter metallireducens GS-15]
+-------------------------------------------------------------------------------------MPVKRVKHCTISGRAVHSLDELYDEIARQLPLPDYFGRNLDALWDVLST----DIEGPVELIWEDSEHSKRSMGKD-YERVVALLKDLTEE-R-EDFRIVFR-----------------------------
+
+>gi|34496656|ref|NP_900871.1| probable Barstar [Chromobacterium violaceum ATCC 12472]
+--------------------------------------------------------------------------------------------MCEL--RHIRSLDQLYDELQRQLPLPGHFGRNLDALYDSLAN----DVQGPFELLWRDTEEARRGMGADVYATVLEILETVAEE-R-GDVTLDIHH----------------------------
+
+>gi|36787345|emb|CAE16434.1| unnamed protein product [Photorhabdus luminescens subsp. laumondii TTO1]
+------------------------------------------------------------------------------------------MHKVEFDFDRIPDLKMFYQQFSEQFELGDEFGSNLDALWDVVTG----GIELPVEVNFIHFTQQKE---RD-FSSLVLLFEEAEEELE-GELSFNIFP----------------------------
+
+>gi|45438454|gb|AAS64000.1| putative ribonuclease inhibitor [Yersinia pestis biovar Medievalis str. 91001]
+------------------------------------------------------------------------------------------MVKVVFDFNHIPDLPAFYRAFSQNFALSEDFGANLDALWDVVTG----EIALPVEIEFVHFSRRHQ---RR-FAAIVLLLEEAEEELA-GRLHFNVVDEHIV------------------------
+
+>gi|2979678|gb|AAC38289.1| ribonuclease inhibitor [Streptomyces aureofaciens]
+-----------------------------------------------------------------------------------------MTVTYVIDGFEIDTLEDFWDVVGQAIGVDGYFGHNLDAFADCLGGGYGTPDDGDYVIEWRHHELSRRRLGCPETVRQLELRLARVHPTNREQVAAELAAARAGKGPTVFDWLVDIIEERHPGGLRLA
+
+>gi|48780465|ref|ZP_00277181.1| hypothetical protein Bcep02008136 [Burkholderia fungorum LB400]
+MNGMSDNVYAHDSGVATDLFAAGDGNLFQRVMQMRAGEQGR-ENQSEAAGTVVSSNEEPMSLFKTVRPNIVQSIRAFRVQDLAEEAHQLGQHFLYAYCANAQSKQEVLETIATSFLFPKHFGKNYDALYDCLTDLVQKAGAQPGFVIVLEQLPVAQKFDKEGRETLLDVFREAAEFWAERKVAFRVFYSFA-------------------------
+
+>gi|67666546|ref|ZP_00463792.1| conserved hypothetical protein [Burkholderia cenocepacia HI2424]
+---MSDSIYAHDT-AAAELFAAGDGNLFQRVIQLHAAAQAGGTPEQQEAEPGLSSNEEPMSLFTTVRPNLVQSIRAFRVQDLADEAGRLGQHFLYAYCGAAQSKQEVMETIATSFLFPKHFGKNYDALYDCLTDLVAKAGAQPGFVIVLEGLPIAQKFDKEGRETLLDVFREAAEFWAERKVAFRVFYSFA-------------------------
+
+>gi|77965936|gb|ABB07316.1| hypothetical protein Bcep18194_A3715 [Burkholderia sp. 383]
+---MSDSIYAHET-AAAELFASGDGNLFQRVIQLHAAAQAGGTPEQQEAEPGLSSNEEPMSLFTTVRPNLVQSIRAFRVQDLADEAGRLGQHFLYAFCGAAQSKQEVMETIATSFLFPKHFGKNYDALYDSLTDLVAKAGAQPGFVIVLDGLPIAQKFDKEGRETLLDVFREAAEFWAERKVAFRVFYSFA-------------------------
+
+>gi|52429075|gb|AAU49668.1| barstar family protein [Burkholderia mallei ATCC 23344]
+-----------------------------------------------------------MSLFATVRPNLVQSIRAFRVQDLADEANQLGQHFLYAYCGNAQSKQEVLETIATSFLFPKHFGKNYDALYDCLTDLVHKAGAQPGFVIVLEALPIAHKFDKEGRETLLDVFREAAEFWAERKVAFRVFYSFA-------------------------
+

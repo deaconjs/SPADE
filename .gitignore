@@ -5,9 +5,21 @@ __pycache__/
 # Editor settings
 .idea/
 
-# Protein systems data (kept local for now)
+# Protein systems data is kept local, except three demo complexes
 Systems2/
-Systems/
+Systems/*
+!Systems/README.md
+!Systems/1brs/
+!Systems/1a0o/
+!Systems/1tx4/
+# demo systems ship only the files SPADE reads, not the alignment pipeline intermediates
+Systems/*/*.fst
+Systems/*/*.cin
+Systems/*/*.clu
+Systems/*/*.dst
+Systems/*/*.ph
+Systems/*/*.bms
+Systems/*/*.hms
 
 # Third-party binary; install ClustalW separately
 clustalw.exe
