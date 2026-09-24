@@ -54,6 +54,10 @@ def fetch_aln_conservation(pchain):
         return 0
     # one column per query residue, the same shape as the lines of an .msq file
     query = sequences[0]
+    # a partial or different query would leave residues unscored or shift every column
+    if query.replace('-', '') != pchain.get_sequence():
+        print(f"{filename}: query sequence does not match chain {pchain.chain_name} exactly, skipping")
+        return 0
     columns = []
     for i in range(len(query)):
         if query[i] != '-':
@@ -272,7 +276,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
         for res in pchain.residues:
             sum, count = _get_1D_sum_and_count(i, pchain)
             sum2,count2= _get_noactsit_s3D_sum_and_count(i, pchain, ligatoms, asa_style, use_asa)
-            sum3,count3= _get_nobadloop_s3D_sum_and_count(i, pchain, asa_style, use_asa)
+            sum3,count3= _get_nobadloop_s3D_sum_and_count(i, pchain, ligatoms, asa_style, use_asa)
             res.data['noactsit_ms3D_conservation'] = (sum+sum2)/(count+count2)
             res.data['nobadloop_ms3D_conservation'] = (sum+sum3)/(count+count3)
             i += 1
@@ -462,8 +466,8 @@ def _get_nobadloop_s3D_sum_and_count(i, pchain, ligatoms, asa_style='sidechain_a
     for ind in pchain.residues[i].neighbors:
         if exposure and pchain.residues[ind].features[asa_style] < 0.05:
             continue
-        res = pchain.residues[i]
-        # if is in a loop that is low conservation, skip
+        res = pchain.residues[ind]
+        # if the neighbour is in a loop that is low conservation, skip
         if res.data['loop_status']:
             conssum = 0.0
             conscnt = 0.0

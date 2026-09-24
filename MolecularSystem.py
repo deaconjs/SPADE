@@ -967,19 +967,32 @@ class System:
                         rui += res.features['differential_sidechain_asa'] *  res.data['exposed_sidechain_area']
             print(f"\n{rui} angstroms under interface {pchain.chain_name}")
         
-    def calculate_interface_significance(self, asa_style):
-        # assumes calculate_differential_system_asa has been called
-        outfile = open('./interface_results.txt', 'a')
-        for pchain in self.ProteinList:
-            line = f"testing chain {pchain.chain_name} pdb {self.filename}"
+    def calculate_interface_significance(self, asa_style, outfile_name='./interface_results.txt', times=10000):
+        """ test whether each chain's interface is more conserved than its surface.
+            assumes calculate_differential_system_asa and conservation have been run.
+            For each conservation measure the interface average is compared against two null
+            models built from the chain's exposed residues:
+              scattered - `times` random sets of the same size (the original test)
+              patch     - contiguous surface patches of the same size: every exposed residue
+                          in turn as a seed plus its nearest exposed neighbours (by pseudo-
+                          sidechain position), so patches are compact like real interfaces.
+                          patch_distinct repeats this using only patches that share under
+                          half their residues with the interface
+            Returns {chain_name: {measure: {'count', 'average', 'scattered', 'patch'}}},
+            where scattered and patch are the percent of null samples the interface matched
+            or beat.
+        """
+        outfile = open(outfile_name, 'a')
+        results = {}
+        def report(line):
             print(line)
             outfile.write(line+'\n')
+        for pchain in self.ProteinList:
+            report(f"testing chain {pchain.chain_name} pdb {self.filename}")
             if 'normalized_0D_conservation' not in pchain.residues[0].features:
-                line = f"no conservation scores for chain {pchain.chain_name} (needs an .msq or .aln alignment), skipping"
-                print(line)
-                outfile.write(line+'\n')
+                report(f"no conservation scores for chain {pchain.chain_name} (needs an .msq or .aln alignment), skipping")
                 continue
-            total_sum = 0.0
+            results[pchain.chain_name] = {}
             rui = 0.0
             for res in pchain.residues:
                 if res.features['binary_dif_'+asa_style] == -1:  # include -- see calculate_differential_system_asa
@@ -987,59 +1000,74 @@ class System:
                         rui += res.features['differential_asa'] *  res.data['exposed_area']
                     elif asa_style == 'asa':
                         rui += res.features['differential_sidechain_asa'] *  res.data['exposed_sidechain_area']
-                    line = f"{res.res_type1}{res.res_number} {res.features['normalized_0D_conservation']}"
-                    print(line)
-                    outfile.write(line+'\n')
+                    report(f"{res.res_type1}{res.res_number} {res.features['normalized_0D_conservation']}")
+            report(f"{rui:5.2f} angstroms under interface {pchain.chain_name}")
 
-            line = f"{rui:5.2f} angstroms under interface {pchain.chain_name}"
-            print(line)
-            outfile.write(line+'\n')
-            
             tokens = ['normalized_0D_conservation', 'normalized_noactsit_0D_conservation', 'normalized_1D_conservation', 'normalized_3D_conservation', 'normalized_ms3D_conservation', 'normalized_noactsit_ms3D_conservation', 'normalized_nobadloop_ms3D_conservation']
+            totals = {'scattered':0.0, 'patch':0.0}
+            measured = 0
             for token in tokens:
                 # calculate the average score over the interface
-                wins = 0
-                times = 10000
                 sum, count = 0.0, 0.0
                 residues = []                   # speedup prefilter -- collect solvent exposed residues
+                in_interface = []
                 for res in pchain.residues:
                     if res.features[asa_style] >= 0.05 and res.features[token] != -1:
                         residues.append(res)
-                        if res.features['binary_dif_'+asa_style] == -1:  # include -- see calculate_differential_system_asa
+                        in_interface.append(res.features['binary_dif_'+asa_style] == -1)
+                        if in_interface[-1]:  # include -- see calculate_differential_system_asa
                             sum += res.features[token]
                             count += 1.0
-                        
+
                 if count > 0:
                     average = sum / count
                 else:
                     print("no residues in the interface")
                     continue
+                size = int(count)
+                if size >= len(residues):
+                    print("interface covers the whole exposed surface; no null model possible")
+                    continue
+                values = [res.features[token] for res in residues]
 
-                monitor = []
-                for res in residues:
-                    monitor.append(0)
-                    
+                # null model 1: scattered random sets of exposed residues
+                wins = 0
                 for i in range(times):
-                    sum = 0.0
-                    count2 = 0
-                    for i in range(len(residues)):
-                        monitor[i] = 0
-                    while count2 < count:
-                        r = random.randint(0,len(residues)-1)
-                        if monitor[r]:
-                            continue
-                        monitor[r] = 1
-                        sum += residues[r].features[token]
-                        count2 += 1
-                    if average >= sum/count2:
+                    sample = random.sample(values, size)
+                    if average >= math.fsum(sample)/size:
                         wins += 1
-                line = f"chain {pchain.chain_name} {token} ({int(count)} residues - {average}) wins {100.0*wins/float(times):4.1f} percent of the time"
-                print(line)
-                outfile.write(line+'\n')
-                total_sum += 100.0*wins/float(times)
-            print(f"chain {pchain.chain_name} interface averages {total_sum/5.0} over the methods")
+                scattered = 100.0*wins/float(times)
+
+                # null model 2: contiguous patches, one per exposed seed residue
+                points = []
+                for res in residues:
+                    pt = getattr(res, 'pseudo_sidechain', None) or res.central_atom
+                    points.append(pt)
+                patch_wins = 0
+                distinct_wins, distinct_count = 0, 0     # patches sharing under half their residues with the interface
+                for seed in range(len(residues)):
+                    order = sorted(range(len(residues)), key=lambda k: points[seed].dist(points[k]))
+                    patch_average = math.fsum([values[k] for k in order[:size]])/size
+                    if average >= patch_average:
+                        patch_wins += 1
+                    if len([k for k in order[:size] if in_interface[k]]) < size/2.0:   # (sum is shadowed here)
+                        distinct_count += 1
+                        if average >= patch_average:
+                            distinct_wins += 1
+                patch = 100.0*patch_wins/float(len(residues))
+                patch_distinct = 100.0*distinct_wins/distinct_count if distinct_count else None
+
+                results[pchain.chain_name][token] = {'count':size, 'average':average, 'scattered':scattered, 'patch':patch,
+                                                     'patch_distinct':patch_distinct, 'distinct_patches':distinct_count}
+                report(f"chain {pchain.chain_name} {token} ({size} residues - {average}) wins {scattered:4.1f} percent of scattered sets, {patch:4.1f} percent of {len(residues)} contiguous patches")
+                totals['scattered'] += scattered
+                totals['patch'] += patch
+                measured += 1
+            if measured:
+                report(f"chain {pchain.chain_name} interface averages {totals['scattered']/measured:4.1f} (scattered) and {totals['patch']/measured:4.1f} (patches) over {measured} methods")
         outfile.close()
-        
+        return results
+
     def build_futamura_intersection_table(self, solvent_radius):        
         outside_barrier = 4.0
         grid_spacing = 4*solvent_radius
