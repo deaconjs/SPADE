@@ -1,6 +1,6 @@
 from ftplib import FTP
 import string
-import Tkinter
+import tkinter
 import Pmw
 import os
 import gzip

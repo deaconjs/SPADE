@@ -132,7 +132,6 @@ class Aligner:
                         Max=maxval
                         xMax=i
                         yMax=j
-                #print score_table[i,j]
         if self.alignment_type == 'global':
             # want to start traceback from the bottom right corner
             i = len(self.target.residues)
@@ -197,9 +196,9 @@ class Aligner:
                 b += bout[ind].res_type1
         
         if print_param:
-            print a
-            print b
-            print '%s positions printed'%(len(a))
+            print(a)
+            print(b)
+            print(f"{len(a)} positions printed")
 
         aout.reverse()
         bout.reverse()

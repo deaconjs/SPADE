@@ -59,7 +59,7 @@ class SequenceAligner(Aligner.Aligner):
                 if aout[ind].res_type1 == bout[ind].res_type1:
                     identical_pairs += 1
             total_pairs += 1
-        print '%5.3f percent identity'%((identical_pairs + 0.0)/total_pairs)
+        print(f"{(identical_pairs + 0.0)/total_pairs:5.3f} percent identity")
         return aout, bout
         
 

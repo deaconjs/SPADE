@@ -24,7 +24,7 @@ def angle (P,Q,R):
 """
 def distance (v1,v2):
   if (len(v1) != len(v2)):
-    print "ERROR: Vectors are not the same length"
+    print("ERROR: Vectors are not the same length")
     return None
   sumSqr=0
   for i in range(len(v1)):
@@ -162,8 +162,8 @@ def findPlanarPosition (distance,angle,P,Q,R,check=False):
     angle_ref=angle
     if (angle > 180): angle_ref=360-angle
     if (angle_gen-angle_ref > 1.0):
-      print "ERROR: angle generated does not match specified angle: (gen)%f != (ref spec)%f"%(angle_gen,angle_ref)
-    if (dot(target_p,z_new) > 0.0001): print "ERROR: target is not in the plane"
+      print(f"ERROR: angle generated does not match specified angle: (gen){angle_gen:f} != (ref spec){angle_ref:f}")
+    if (dot(target_p,z_new) > 0.0001): print("ERROR: target is not in the plane")
 
   return target
 
@@ -197,6 +197,6 @@ def findCirclePosition (distance,angle,circle_angle,P,Q,R,check=False):
     angle_ref=angle
     if (angle > 180): angle_ref=360-angle
     if (angle_gen-angle_ref > 1.0):
-      print "ERROR: angle generated does not match specified angle: (gen)%f != (ref spec)%f"%(angle_gen,angle_ref)
+      print(f"ERROR: angle generated does not match specified angle: (gen){angle_gen:f} != (ref spec){angle_ref:f}")
 
   return target

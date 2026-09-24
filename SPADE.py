@@ -4,8 +4,7 @@ import os.path
 import sys
 import string
 import re
-from Tkinter import *
-from tkFileDialog import *
+from tkinter import *
 # dependency imports
 sys.path.append('./Dependencies')
 import vtk
@@ -38,7 +37,7 @@ def load_application(parent, app, selected_title, active_window, active_window_k
         #                                        active_window.application_pages[selected_title],
         #                                        active_window.viewer)
     elif app == 'AlignmentEditor':
-        print 'loading Alignment Editor for chain %s'%(chain)
+        print(f"loading Alignment Editor for chain {chain}")
         reload(TreeSystem)
         window = active_window.application_pages[selected_title]
         viewer = active_window.viewer
@@ -75,12 +74,12 @@ class SPADEGUI(Frame):
         border=8
         self.toplevel.top_width=int(0.8*spade.winfo_screenwidth()-2*border)
         self.toplevel.top_height=int(0.182*spade.winfo_screenheight())
-        geometry_string = "%dx%d%+d%+d"%(self.toplevel.top_width,
-                                         self.toplevel.top_height,
-                                         int(0.2*spade.winfo_screenwidth()+border),
-                                         int(0.8*0.91*spade.winfo_screenheight())) # width,height,x-offset,y-offset
+        geometry_string = (
+            f"{self.toplevel.top_width}x{self.toplevel.top_height}"
+            f"+{int(0.2 * spade.winfo_screenwidth() + border)}"
+            f"+{int(0.8 * 0.91 * spade.winfo_screenheight())}"
+        )
         self.toplevel.geometry(geometry_string)
-
         self.codebox  = CodeBox(self.toplevel)
         
 class MenuSystem(Frame):
@@ -132,7 +131,7 @@ class MenuSystem(Frame):
             # a database transformation draws from one source and supplies a user-defined database.
             # Create a window for choosing a target database name and a database source.
             tnsf_win = Toplevel(spade)
-            geometry_string = "%dx%d%+d%+d" %(250,100,400,200) # width,height,x-offset,y-offset
+            geometry_string = "250x100+400+200" # width,height,x-offset,y-offset
             tnsf_win.geometry(geometry_string)
             # add an entry form for the target database name
             tnsf_win.target_entry = Pmw.EntryField(tnsf_win, labelpos = 'w', label_text = 'Target Database:', validate = None, value='default_database')
@@ -157,14 +156,14 @@ class MenuSystem(Frame):
             if len(db_path) > 0:
                 soln = re.search('.*SPADE.*',db_path)
                 if not soln:
-                    print "The directory must be within SPADE' Databases subdirectory\n"
+                    print("The directory must be within SPADE' Databases subdirectory\n")
                     self.openNewDatabase()  # if it fails, recurse through this function
                     return
                 # now remove everything up to 'Databases'. This assumption allows short and meaningful names.
                 db_token = os.path.normpath(os.path.abspath("./"))
                 rep_db_path = string.split(db_path, db_token, 1)
                 databases.append(rep_db_path[1])        # slice out the slash that gets left behind
-                self.parent.objectbox.database_listbox.insert('end',"%s"%(rep_db_path[1]))
+                self.parent.objectbox.database_listbox.insert('end',f"{rep_db_path[1]}")
                 # reset the selection
                 for i in range(self.parent.objectbox.database_listbox.size()):
                     self.parent.objectbox.database_listbox.select_clear(i)
@@ -205,7 +204,7 @@ class ApplicationBox:
         self.applications_available = os.listdir('./Applications')
         for application in self.applications_available:
             if not application.startswith("README"):
-                self.applications_listbox.insert('end', '%s'%(application))
+                self.applications_listbox.insert('end', f"{application}")
         self.active_window_key = None
             
     def select_target_system(self, event=None):
@@ -245,13 +244,13 @@ class ApplicationBox:
             self.dialog.withdraw()
             # Add some contents to the dialog.
             if len(spade.ui.system_windows.keys()) == 1:
-                w = Label(self.dialog.interior(),text = 'Launching an application on %s'%(spade.ui.system_windows.keys()[0]))
+                w = Label(self.dialog.interior(),text = f"Launching an application on {spade.ui.system_windows.keys()[0]}")
             else:
-                w = Label(self.dialog.interior(),text = 'Launching an application on %s'%(spade.ui.database_windows.keys()[0]))
+                w = Label(self.dialog.interior(),text = f"Launching an application on {spade.ui.database_windows.keys()[0]}")
             w.pack(expand = 1, fill = 'both', padx = 4, pady = 4)
             self.dialog.show()
         else:
-            print 'open a system or database first'
+            print("open a system or database first")
                 
             
     def decide_on_launch(self, result):
@@ -269,7 +268,7 @@ class ApplicationBox:
         i = self.dialog.listbox.curselection()
         if len(i) > 0:
             idx = int(i[0])
-            if idx <= len(spade.system_windows.keys()):
+            if idx <= len(spade.ui.system_windows.keys()):
                 self.active_window_key = spade.ui.system_windows.keys()[idx]
             else:   # the listbox curselection content order is system keys first database keys second, so
                 self.active_window_key = spade.ui.database_windows.keys()[idx-len(spade.ui.system_windows.keys())]
@@ -290,9 +289,9 @@ class ApplicationBox:
             for pchain in systems[self.active_window_key].ProteinList:
                 pchain_seq = pchain.get_sequence()
                 if len(pchain_seq) < 40:
-                    print "skipping load application on chain %s, len %s %s"%(pchain.chain_name, len(pchain_seq), pchain_seq)
+                    print(f"skipping load application on chain {pchain.chain_name}, len {len(pchain_seq)} {pchain_seq}")
                     continue
-                selected_title = 'AlignmentEditor %s'%(pchain.chain_name)
+                selected_title = f"AlignmentEditor {pchain.chain_name}"
                 active_window.application_pages[selected_title] = active_window.application_notebook.add(selected_title)
                 active_window.pw.configurepane('info', size=0.5)    # default sizes
                 active_window.pw.configurepane('viewer', size=0.5)
@@ -310,10 +309,10 @@ class ApplicationBox:
             # collect all systems from the database
             selected_index = self.parent.ui.objectbox.database_listbox.curselection()
             if len(selected_index) == 0:
-                print "none selected"
+                print("none selected")
                 return
             selected_title = string.strip(self.parent.ui.objectbox.database_listbox.get(selected_index)[1:])
-            print 'title %s'%(selected_title)
+            print(f"title {selected_title}")
             db_dir = './Databases/' + selected_title
             
             # open a new System window
@@ -324,9 +323,9 @@ class ApplicationBox:
             active_window = spade.ui.system_windows[self.active_window_key]
             while selected_title in active_window.application_pages.keys():
                 if cntr == 2:
-                    selected_title = '%s %s'%(selected_title, '2')
+                    selected_title = f"{selected_title} 2"
                 else:
-                    selected_title = '%s %s'%(selected_title[:-2], '%s'%(cntr))
+                    selected_title = f"{selected_title[:-2]} {cntr}"
                 cntr += 1
             active_window.application_pages[selected_title] = active_window.application_notebook.add(selected_title)
             active_window.pw.configurepane('info', size=0.5)    # default sizes
@@ -415,7 +414,7 @@ class ObjectBox:
         keys = string.split(selected_title, ' ', 1)
         keys[1] = string.strip(keys[1])
         internal_location = keys[1] #os.path.normpath(os.path.join(self.systems_directory, keys[1]))
-        print 'internal loc %s'%(internal_location)
+        print(f"internal loc {internal_location}")
         location = None
         open_type = None
         if keys[0] == '.':                                                          # if the system at the given path is not loaded
@@ -439,9 +438,9 @@ class ObjectBox:
                                 open_type = 'pdb'                                   # and the type to load
                                 break
                     else:                                                       # else fail
-                        print 'No .sps or .pdb files found in the directory'
+                        print("No .sps or .pdb files found in the directory")
                         if len(d_list) == 0:
-                            print 'In fact, directory %s is empty'%(full_path)
+                            print(f"In fact, directory {full_path} is empty")
                         return
             else:                                                               # if it is a file
                 split_filename = string.split(descriptor, '.')
@@ -455,7 +454,7 @@ class ObjectBox:
             if internal_location not in systems.keys():
                 new_sys = MolecularSystem.System(location)
                 systems[internal_location] = new_sys               # systems may be retrieved by location or by index
-                print 'system available at systems[%s]'%(internal_location)
+                print(f"system available at systems[{internal_location}]")
 
             # set the selection of the listbox
             for i in range(self.system_listbox.size()):
@@ -485,7 +484,7 @@ class ObjectBox:
             self.miniviewer.GetImageViewer().SetInput(resizer.GetOutput())
             
         else:
-            print 'no %s image available'%(system.get_filename_by_extension('.jpg'))
+            print("no {system.get_filename_by_extension('.jpg')} image available")
         self.miniviewer.Render()
     
     def load3DMiniView(self, system):
@@ -566,7 +565,7 @@ class ObjectBox:
             # which database is it?
             selected_index = self.database_listbox.curselection()
             if len(selected_index)==0:
-                print "none selected"
+                print("none selected")
                 return
             selected_title = string.strip(self.database_listbox.get(selected_index)[1:])
             # if its a user_defined database
@@ -622,10 +621,10 @@ class ObjectBox:
             if selected_title == "SCOP":
                 new_window.dbViewer = ScopDomainViewer.ScopViewer(new_window.panes, new_window.panes, 'None')
             else:
-                print 'opening db'
-                print new_window.panes
-                print pathname
-                print new_window
+                print("opening db")
+                print(new_window.panes)
+                print(pathname)
+                print(new_window)
                 new_window.dbViewer = DatabaseDomainViewer.UserDbViewer(new_window.panes, pathname, new_window)
             new_window.dbViewer.pack(expand=1, fill=BOTH)
             # add an empty system
@@ -642,9 +641,7 @@ class ObjectBox:
         new_window.info_pane.parent = new_window
         new_window.pw.pack(side=TOP,expand=1,fill='both')
         # open a molecular viewer
-        print 'here 1'
         new_window.viewer = MolecularViewer.MolecularViewer(new_window.viewer_pane, new_window.system)
-        print 'here 2'
         new_window.application_notebook = Pmw.NoteBook(new_window.info_pane, borderwidth=1, tabpos='n')
         new_window.application_notebook.pack(expand=YES, fill=BOTH)
         new_window.application_pages = {}
@@ -681,7 +678,7 @@ class CodeBox:
         or top contains a textbox where code can be simply written and evaluated, and where script files can 
         be managed. A PMW Notepad allows multiple files to be edited simultaneously.
         """
-        print 'Codebox Next and Prev commands dont yet capture w/out mouse interaction'
+        print("Codebox Next and Prev commands dont yet capture w/out mouse interaction")
         self.alias_system = alias_system         # used when codebox is attached to a MolecularViewer
         self.alias_viewer = alias_viewer
         self.toplevel = parent_window
@@ -724,14 +721,14 @@ class CodeBox:
         """ make a new filename of the format tmp#.mpy, where # is some value not present in the current list
          of opened mpy scripts."""
         names = self.file_notebook.pagenames()
-        print names
+        print(names)
         for i in range(0,10):
             file_name = 'tmp%d.mpy'%(i)
             if file_name not in names:
                 break
         else:
-            print "Too many files open (>10)\n"
-        print file_name
+            print("Too many files open (>10)\n")
+        print(file_name)
         self.file_pages[file_name] = self.file_notebook.add(file_name)
         self.file_pages[file_name].text = Pmw.ScrolledText(self.file_pages[file_name], borderframe=5,text_wrap='none')
         self.file_pages[file_name].text.pack()
@@ -756,11 +753,11 @@ class CodeBox:
         selected_title = self.file_notebook.getcurselection()
         self.saveCurrentScript()
         if self.alias_system:
-            globals = {'system':self.alias_system, 'viewer':self.alias_viewer}
+            globals_dict = {'system':self.alias_system, 'viewer':self.alias_viewer}
         else:
-            globals = {'systems':systems, 'spade':spade, 'system_windows':spade.ui.system_windows}
-        locals  = {}
-        exec open(os.path.join('Scripts', selected_title)).read() in globals, locals
+            globals_dict = {'systems':systems, 'spade':spade, 'system_windows':spade.ui.system_windows}
+        locals_dict  = {}
+        exec(open(os.path.join('Scripts', selected_title)).read(), globals_dict, locals_dict)
         
     def saveCurrentScript(self, event=None):
         """ save the currently selected script """

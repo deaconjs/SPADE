@@ -142,7 +142,7 @@ class Polymer(Molecule):
             if rez.has_central_pt==1:
                 central_point_list.append(rez.central_pt)
             else:
-                print 'missing central atom for rez %s'%(rez.res_number)
+                print(f"missing central atom for res {rez.res_number}")
         return central_point_list
 
     def get_central_atom_list(self):

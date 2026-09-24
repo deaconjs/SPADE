@@ -26,9 +26,9 @@ scoring_matrix =  {'A-':6/15.0,
                    'AW': 2/15.0, 'RW': 9/15.0, 'NW': 2/15.0, 'DW': 1/15.0, 'CW':10/15.0, 'QW': 4/15.0, 'EW': 1/15.0, 'GW': 7/15.0, 'HW': 4/15.0, 'IW': 3/15.0, 'LW': 6/15.0, 'KW': 4/15.0, 'MW': 4/15.0, 'FW': 7/15.0, 'PW': 2/15.0, 'SW': 5/15.0, 'TW': 3/15.0, 'WW':15/15.0, 'Y-': 6/15.0,
                    'AY': 3/15.0, 'RY': 5/15.0, 'NY': 8/15.0, 'DY': 6/15.0, 'CY':12/15.0, 'QY': 6/15.0, 'EY': 3/15.0, 'GY': 2/15.0, 'HY':14/15.0, 'IY': 5/15.0, 'LY': 6/15.0, 'KY': 3/15.0, 'MY': 4/15.0, 'FY':15/15.0, 'PY': 3/15.0, 'SY': 7/15.0, 'TY': 4/15.0, 'WY': 8/15.0, 'YY':15/15.0, 'V-': 6/15.0,
                    'AV':11/15.0, 'RV': 4/15.0, 'NV': 5/15.0, 'DV': 5/15.0, 'CV': 7/15.0, 'QV': 4/15.0, 'EV': 5/15.0, 'GV': 6/15.0, 'HV': 4/15.0, 'IV':15/15.0, 'LV':11/15.0, 'KV': 4/15.0, 'MV':12/15.0, 'FV': 8/15.0, 'PV': 7/15.0, 'SV': 7/15.0, 'TV':10/15.0, 'WV': 4/15.0, 'YV': 4/15.0, 'VV':15/15.0, '--':11/15.0}
-for key in scoring_matrix.keys():
-    if key[1]+key[0] not in scoring_matrix.keys():
-        scoring_matrix[key[1]+key[0]] = scoring_matrix[key[0]+key[1]]
+for key in list(scoring_matrix.keys()):
+    if key[1]+key[0] not in scoring_matrix:
+        scoring_matrix[key[1] + key[0]] = scoring_matrix[key[0] + key[1]]
 
 def fetch_msq_conservation(pchain):
     """ shortcut to apply .msq files as alignments: probably not a permenant function """
@@ -36,7 +36,7 @@ def fetch_msq_conservation(pchain):
     try:
         contact_file = open(filename)
     except IOError:
-        print 'no .msq file present for chain %s'%(pchain.chain_name)
+        print(f"no .msq file present for chain {pchain.chain_name}")
         return 0
 
     lines = contact_file.readlines()
@@ -55,11 +55,11 @@ def fetch_msq_conservation(pchain):
     for i in range(len(target_out)):
         if target_out[i] == '-' and template_out[i] != '-':
             # gap in the target... advance template
-            print "\n\n!!!  MISALIGNMENT  !!!\n\n"
+            print("\n\n!!!  MISALIGNMENT  !!!\n\n")
             template_index += 1
         elif target_out[i] != '-' and template_out[i] == '-':
             # gap in the template... advance target
-            print "\n\n!!!  MISALIGNMENT  !!!\n\n"
+            print("\n\n!!!  MISALIGNMENT  !!!\n\n")
             pchain.residues[target_index].data['conservation'] = ""
             target_index += 1
         elif target_out[i] != '-' and template_out[i] != '-':
@@ -67,7 +67,7 @@ def fetch_msq_conservation(pchain):
             template_index += 1
             target_index += 1
         else:
-            print 'error'
+            print("error")
     return 1 # success -- found an msq file
 
 def apply_sequence_alignment(system, sequences):
@@ -83,19 +83,15 @@ def apply_sequence_alignment(system, sequences):
     for pchain in system.ProteinList:
         s = pchain.get_sequence()
         if s != match_sequence:
-            print 'no match for chain %s'%(pchain.chain_name)
+            print(f"no match for chain {pchain.chain_name}")
             continue
         else:
-            print 'match ok for chain %s'%(pchain.chain_name)
+            print(f"match ok for chain {pchain.chain_name}")
             
         rs_index = 0
-        #print '***' + len(first_sequence), first_sequence
-        #for seq in sequences:
-        #    print len(seq), seq
         
         for fs_ind in range(len(first_sequence)):
             k = string.upper(first_sequence[fs_ind])
-            #print fs_ind, len(first_sequence), k
             if k in ['A','C','D','E','F','G','H','I','K','L','M','N','P','Q','R','S','T','V','W','Y']:
                 conservation = ''
                 for seq in sequences:
@@ -124,10 +120,10 @@ def print_sequence_alignment(system):
             pass
         else:
             for sequence in pchain.data['sequence_alignment']:
-                print sequence
-            print pchain.data['sequence_alignment']
+                print(sequence)
+            print(pchain.data['sequence_alignment'])
             for res in pchain.residues:
-                print res.data['conservation']
+                print(res.data['conservation'])
 
 def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=None):
     system.calculate_differential_system_asa(1.4, 1000, rewrite)
@@ -136,7 +132,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
         try:
             pchain.residues[0].data['conservation']
         except KeyError:
-            print "no key conservation found in pchain %s"%(pchain.chain_name)
+            print(f"no key conservation found in pchain {pchain.chain_name}")
             continue
 
         use_asa = 0
@@ -144,7 +140,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
             try:
                 res.features[asa_style]
             except KeyError:
-                print 'no solvent accessibilities calculated, aborting conservation calculations'
+                print("no solvent accessibilities calculated, aborting conservation calculations")
                 break
         else:
             use_asa = 1
@@ -154,12 +150,12 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
             try:
                 res.data['conservation']
             except KeyError:
-                print 'fetching conservation from msqs'
+                print("fetching conservation from msqs")
                 cons_test = fetch_msq_conservation(pchain)
                 break
 
         if not cons_test:
-            print 'no alignment file found for chain %s'%(pchain.chain_name)
+            print(f"no alignment file found for chain {pchain.chain_name}")
             continue
 
         for res in pchain.residues:             # test for shielding calculations
@@ -178,7 +174,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
                 count = 0.0
                 for i1 in range(len(cons_string)-1):
                     for i2 in range(i1+1, len(cons_string)):
-                        key = '%s%s'%(cons_string[i1],cons_string[i2])
+                        key = f"{cons_string[i1]}{cons_string[i2]}"
                         try:
                             score += scoring_matrix[key]
                         except KeyError:
@@ -248,7 +244,7 @@ def calculate_conservation(system, asa_style='sidechain_asa', rewrite=0, viewer=
         #types = ['0D_conservation', '1D_conservation', '3D_conservation', 'ms3D_conservation']
         types = ['noactsit_0D_conservation', '1D_conservation', '3D_conservation', 'ms3D_conservation', 'noactsit_ms3D_conservation', 'nobadloop_ms3D_conservation']
         for type in types:
-            print 'calculating conservation %s'%(type)
+            print(f"calculating conservation {type}")
             minval,maxval=10.0,0.0
             # first find the range
             for res in pchain.residues:

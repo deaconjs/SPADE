@@ -1,0 +1,17 @@
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Editor settings
+.idea/
+
+# Protein systems data (kept local for now)
+Systems2/
+Systems/
+
+# Third-party binary; install ClustalW separately
+clustalw.exe
+
+# Applications are kept local, not published
+Applications/
+AlignmentEditor.tar

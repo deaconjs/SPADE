@@ -41,7 +41,7 @@ class AminoAcid(Molecule):
         try:
             self.atoms_dict['CA']
         except KeyError:
-            print "Warning: %s%d has no apparent alpha carbon"%(self.res_type, self.res_number)
+            print(f"Warning: {self.res_type}{self.res_number} has no apparent alpha carbon")
 
         types = {'ALA':71.09,'CYS':103.15,'CYD':103.15,'CYX':103.15,'CYZ':103.15,
                  'ASP':115.09,'GLU':129.12,'PHE':147.18,
@@ -93,10 +93,10 @@ class AminoAcid(Molecule):
             try:
                 average_val += string.atof(atom.features[feature])
             except ValueError:
-                print 'Feature %s is not a number for atom %s'%(feature, atom.atom_num)
+                print(f"Feature {feature} is not a number for atom {atom.atom_num}")
                 return None
             except KeyError:
-                print 'Feature %s does not exist for atom %s'%(feature, atom.atom_num)
+                print(f"Feature {feature} does not exist for atom {atom.atom_num}")
                 return None
         return average_val / (len(self.atoms)+0.0)
 

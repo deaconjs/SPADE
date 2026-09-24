@@ -2,14 +2,12 @@ import os
 import pickle
 import string
 
-
 peakrec_fraction = 2
-home_dir = '/home/deaconjs/Desktop/SPADE/'
-
-parms_dat = os.path.join(home_dir, 'parms.dat')
+parms_dat = os.path.join(".", 'parms.dat')
 
 def get(query_parm=None):
-    execfile(parms_dat, globals())
+    with open(parms_dat, 'r') as f:
+        exec(f.read(), globals())
     if query_parm == None:
         return parms_list.keys()
     else:
@@ -33,5 +31,5 @@ def set(query_parm, value):
 
 def what():
     execfile(parms_dat, globals())
-    print parms_list.keys()
+    print(parms_list.keys())
     

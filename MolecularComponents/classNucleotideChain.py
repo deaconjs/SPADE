@@ -56,6 +56,6 @@ class NucleotideChain(Polymer):
         return my_sequence
     def print_sequence(self):
         x = self.get_sequence()
-        print x
+        print(x)
     
 

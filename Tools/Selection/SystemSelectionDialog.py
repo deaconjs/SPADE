@@ -1,11 +1,11 @@
-import Tkinter
-from Tkinter import END
+import tkinter
+from tkinter import END
 import string
 import sys
 sys.path.append('Dependencies')
 import Pmw
 
-class SystemSelectionDialog(Tkinter.Frame):
+class SystemSelectionDialog(tkinter.Frame):
     def __init__(self, viewer, top, system, return_selected=0, return_list=[], see_shortcuts=0, exit_function=None):
         """ can be used as either a query tool that returns a single molecule,
             residue or atom, or as a general selection tool for changing the
@@ -193,7 +193,7 @@ class SystemSelectionDialog(Tkinter.Frame):
        
         if len(tokens) > 1:         # if a polymer has been expanded
             index = 0
-            print tokens
+            print(tokens)
             for res in self.system.PolymerDict[tokens[2]].residues:
                 start = "%d.0"%(index+1)
                 end = "%d.%d"%(index+1, len(lines[index]))
@@ -228,7 +228,7 @@ class SystemSelectionDialog(Tkinter.Frame):
                 self.return_list.append(selected_molecules[0])
                 return self.return_list
             else:
-                print 'Select just one molecule'
+                print("Select just one molecule")
         
     def _deselect_molecules(self):
         for mol in self._get_selected_molecules():
@@ -239,31 +239,34 @@ class SystemSelectionDialog(Tkinter.Frame):
     def _expand_molecules(self):
         mols = self._get_selected_molecules()
         # for now, just do the first one
-        mol = mols[0]
-        if mol.__module__ in ['MolecularComponents.classProtein', 'MolecularComponents.classNucleotideChain']:
-            self.residueWorkBox.delete(0,END)
-            self.residueSelectionText.delete(1.0,END)
-            self.atomWorkBox.delete(0, END)
-            self.atomSelectionText.delete(1.0, END)
-            for res in mol.residues:
-                self.residueWorkBox.insert(END, '%3s %s'%(res.res_type, res.res_number))
-                self.residueSelectionText.insert(END, '%3s %s\n'%(res.res_type, res.res_number))
-            if mol.__module__ == 'MolecularComponents.classProtein':
-                self.alabel_text.set('Atoms')
-                self.rlabel_text.set('Residues: pchain %s'%(mol.chain_name))
-            elif mol.__module__ == 'MolecularComponents.classNucleotideChain':
-                self.alabel_text.set('Atoms')
-                self.rlabel_text.set('Residues: nchain %s'%(mol.chain_name))           
-        elif mol.__module__ == 'MolecularComponents.classLigand':
-            self.residueWorkBox.delete(0,END)
-            self.residueSelectionText.delete(1.0,END)
-            self.atomWorkBox.delete(0, END)
-            self.atomSelectionText.delete(1.0,END)
-            for atom in mol.atoms:
-                self.atomWorkBox.insert(END, '%3s %s'%(atom.atom_type, atom.atom_number))
-                self.atomSelectionText.insert(END, '%3s %s\n'%(atom.atom_type, atom.atom_number))
-            self.rlabel_text.set('Residues')
-            self.alabel_text.set('Atoms: ligand %s %s'%(mol.res_number, mol.chain_name))
+        if len(mols):
+            mol = mols[0]
+            if mol.__module__ in ['MolecularComponents.classProtein', 'MolecularComponents.classNucleotideChain']:
+                self.residueWorkBox.delete(0,END)
+                self.residueSelectionText.delete(1.0,END)
+                self.atomWorkBox.delete(0, END)
+                self.atomSelectionText.delete(1.0, END)
+                for res in mol.residues:
+                    self.residueWorkBox.insert(END, '%3s %s'%(res.res_type, res.res_number))
+                    self.residueSelectionText.insert(END, '%3s %s\n'%(res.res_type, res.res_number))
+                if mol.__module__ == 'MolecularComponents.classProtein':
+                    self.alabel_text.set('Atoms')
+                    self.rlabel_text.set('Residues: pchain %s'%(mol.chain_name))
+                elif mol.__module__ == 'MolecularComponents.classNucleotideChain':
+                    self.alabel_text.set('Atoms')
+                    self.rlabel_text.set('Residues: nchain %s'%(mol.chain_name))           
+            elif mol.__module__ == 'MolecularComponents.classLigand':
+                self.residueWorkBox.delete(0,END)
+                self.residueSelectionText.delete(1.0,END)
+                self.atomWorkBox.delete(0, END)
+                self.atomSelectionText.delete(1.0,END)
+                for atom in mol.atoms:
+                    self.atomWorkBox.insert(END, '%3s %s'%(atom.atom_type, atom.atom_number))
+                    self.atomSelectionText.insert(END, '%3s %s\n'%(atom.atom_type, atom.atom_number))
+                self.rlabel_text.set('Residues')
+                self.alabel_text.set('Atoms: ligand %s %s'%(mol.res_number, mol.chain_name))
+        else:
+            print("no selected mols")
         self._update_selection_state()
         
     def _get_selected_molecules(self):
@@ -290,7 +293,7 @@ class SystemSelectionDialog(Tkinter.Frame):
                 self.return_list.append(selected_residues[0])
                 return self.return_list
             else:
-                print 'Select just one residue'
+                print("Select just one residue")
         
     def _deselect_residues(self):
         for res in self._get_selected_residues():
@@ -347,7 +350,7 @@ class SystemSelectionDialog(Tkinter.Frame):
                 self.return_list.append(atoms[0])
                 return self.return_list
             else:
-                print 'Select just one atom'
+                print("Select just one atom")
 
     def _deselect_atoms(self):
         atoms = self._get_selected_atoms()
@@ -361,7 +364,7 @@ class SystemSelectionDialog(Tkinter.Frame):
         chain_name = ''
         chain = None
         tokens = string.split(self.alabel_text.get())
-        print tokens
+        print(tokens)
         if len(tokens) == 4:
             chain_name = tokens[3]
         res_number = tokens[2]

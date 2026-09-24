@@ -1,2 +1,171 @@
 
 testing chain A pdb /home/deaconjs/Desktop/Projects/SPADE/SPADE/Systems/2h4f/2h4f.pdb
+
+testing chain A pdb /home/deaconjs/Desktop/SPADE/Systems/2h4f/2h4f.pdb
+
+testing chain A pdb /home/deaconjs/Desktop/SPADE/Systems/2h4f/2h4f.pdb
+
+testing chain A pdb /home/deaconjs/Desktop/SPADE/Systems/1dce/1DCE.pdb
+
+testing chain A pdb /home/deaconjs/Desktop/SPADE/Systems/1dkg/1dkg.pdb
+D41 0.380710659898, 
+K43 0.324873096447, 
+V44 1.0, 
+L47 1.0, 
+E48 0.822335025381, 
+Q50 0.715736040609, 
+L51 1.0, 
+A54 0.451776649746, 
+Q55 0.715736040609, 
+R57 0.893401015228, 
+E58 1.0, 
+G61 0.421319796954, 
+I62 0.807106598985, 
+V65 0.51269035533, 
+K66 0.715736040609, 
+E68 1.0, 
+M69 0.624365482234, 
+N71 1.0, 
+L72 0.741116751269, 
+R73 1.0, 
+R74 1.0, 
+T76 0.685279187817, 
+D79 1.0, 
+I80 1.0, 
+K82 1.0, 
+A83 0.786802030457, 
+A87 0.822335025381, 
+L88 0.857868020305, 
+K90 0.918781725888, 
+F91 1.0, 
+E94 1.0, 
+L95 0.928934010152, 
+P97 1.0, 
+V98 1.0, 
+S101 0.771573604061, 
+L102 1.0, 
+R104 1.0, 
+A105 0.893401015228, 
+E107 0.730964467005, 
+V108 0.624365482234, 
+A109 0.817258883249, 
+M116 0.441624365482, 
+M119 0.761421319797, 
+D122 0.822335025381, 
+I123 1.0, 
+L125 1.0, 
+T126 1.0, 
+S129 1.0, 
+M130 0.604060913706, 
+V133 0.619289340102, 
+V134 1.0, 
+F137 1.0, 
+L149 0.771573604061, 
+P151 1.0, 
+N152 0.543147208122, 
+Q155 1.0, 
+A156 1.0, 
+I157 0.837563451777, 
+A158 0.710659898477, 
+M159 0.928934010152, 
+A166 0.203045685279, 
+M174 0.928934010152, 
+R183 1.0, 
+T184 0.314720812183, 
+A187 0.619289340102, 
+M189 1.0, 
+2954.87 angstroms under interface A
+chain A normalized_0D_conservation (66 residues - 0.819258575604) wins 81.0 percent of the time
+chain A normalized_noactsit_0D_conservation (66 residues - 0.819258575604) wins 80.1 percent of the time
+chain A normalized_1D_conservation (66 residues - 0.630717552887) wins 99.1 percent of the time
+chain A normalized_3D_conservation (66 residues - 0.701547798607) wins 98.7 percent of the time
+chain A normalized_ms3D_conservation (66 residues - 0.693363167149) wins 98.9 percent of the time
+chain A normalized_noactsit_ms3D_conservation (66 residues - 0.693363167149) wins 98.5 percent of the time
+chain A normalized_nobadloop_ms3D_conservation (66 residues - 0.693880825281) wins 98.3 percent of the time
+
+testing chain B pdb /home/deaconjs/Desktop/SPADE/Systems/1dkg/1dkg.pdb
+R40 0.959537572254, 
+K43 0.231213872832, 
+V44 1.0, 
+L47 1.0, 
+E48 0.797687861272, 
+Q50 0.676300578035, 
+L51 1.0, 
+A54 0.375722543353, 
+Q55 0.676300578035, 
+R57 0.878612716763, 
+E58 1.0, 
+G61 0.341040462428, 
+I62 0.780346820809, 
+V65 0.445086705202, 
+K66 0.676300578035, 
+E68 1.0, 
+M69 0.57225433526, 
+L72 0.705202312139, 
+R73 1.0, 
+T76 0.64161849711, 
+I80 0.0982658959538, 
+A83 0.757225433526, 
+H84 1.0, 
+A87 0.797687861272, 
+L88 0.838150289017, 
+F91 1.0, 
+I92 0.381502890173, 
+E94 1.0, 
+L95 0.919075144509, 
+V98 1.0, 
+S101 0.739884393064, 
+L102 1.0, 
+R104 1.0, 
+A105 0.878612716763, 
+M116 0.364161849711, 
+M119 0.728323699422, 
+V120 1.0, 
+D122 0.797687861272, 
+I123 1.0, 
+L125 1.0, 
+T126 1.0, 
+S129 1.0, 
+M130 0.549132947977, 
+V133 0.566473988439, 
+V134 1.0, 
+K136 1.0, 
+F137 1.0, 
+2096.18 angstroms under interface B
+chain B normalized_0D_conservation (47 residues - 0.79092362563) wins 52.0 percent of the time
+chain B normalized_noactsit_0D_conservation (47 residues - 0.79092362563) wins 51.9 percent of the time
+chain B normalized_1D_conservation (47 residues - 0.621035728623) wins 74.0 percent of the time
+chain B normalized_3D_conservation (47 residues - 0.714025894046) wins 60.9 percent of the time
+chain B normalized_ms3D_conservation (47 residues - 0.6328006105) wins 68.7 percent of the time
+chain B normalized_noactsit_ms3D_conservation (47 residues - 0.6328006105) wins 68.8 percent of the time
+chain B normalized_nobadloop_ms3D_conservation (47 residues - 0.632730927487) wins 60.8 percent of the time
+
+testing chain D pdb /home/deaconjs/Desktop/SPADE/Systems/1dkg/1dkg.pdb
+D20 1.0, 
+E28 1.0, 
+G32 1.0, 
+L49 1.0, 
+P53 1.0, 
+R56 1.0, 
+Q57 1.0, 
+V59 1.0, 
+T60 1.0, 
+Y130 1.0, 
+G132 1.0, 
+L257 0.974501108647, 
+Q260 1.0, 
+R261 1.0, 
+E264 1.0, 
+K268 1.0, 
+N282 1.0, 
+P284 1.0, 
+Y285 1.0, 
+H295 1.0, 
+841.95 angstroms under interface D
+chain D normalized_0D_conservation (20 residues - 0.998725055432) wins 100.0 percent of the time
+chain D normalized_noactsit_0D_conservation (20 residues - 0.998725055432) wins 100.0 percent of the time
+chain D normalized_1D_conservation (20 residues - 0.870263758559) wins 96.5 percent of the time
+chain D normalized_3D_conservation (20 residues - 0.945433088814) wins 97.8 percent of the time
+chain D normalized_ms3D_conservation (20 residues - 0.923054747275) wins 99.7 percent of the time
+chain D normalized_noactsit_ms3D_conservation (20 residues - 0.923054747275) wins 99.6 percent of the time
+chain D normalized_nobadloop_ms3D_conservation (19 residues - 0.923809571908) wins 99.2 percent of the time

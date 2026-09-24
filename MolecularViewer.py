@@ -1,52 +1,36 @@
 # python imports
 import sys
 import os
-import os.path
-sys.path.append(os.getcwd())
 import copy
 import math
 import time
 import random
-from Tkinter import *
-# tool imports
-import SPADE
-sys.path.append('./Tools/DetectDomains')
-import DetectDomains
-sys.path.append('./Tools/Selection')
-import SystemSelectionDialog
-sys.path.append('./Tools/Aligner')
-import SequenceAligner
-sys.path.append('./Tools/ConservationTools')
-import ConservationTools
-
-# handle command line the lame way
-homedir = '.'
+import string
 from sys import argv         
-#if len(argv) == 2:
-homedir = 'C:\Users\Dude\Desktop\SPADE'
-
-sys.path.append(homedir)
 
 # dependency imports
-#from vtk import *
-import vtk.tk.vtkTkRenderWidget
-import tkFileDialog
-#from vtk.tk.vtkTkRenderWindowInteractor import *
-from MolecularComponents.classFutamuraHash import FutamuraHash 
+from tkinter import *
+from tkinter import filedialog
 import vtk
+import pyvista
+import vtk.tk.vtkTkRenderWidget
+from vtk.tk.vtkTkRenderWindowInteractor import vtkTkRenderWindowInteractor
+import Pmw
 
 # internal imports
-sys.path.append(os.getcwd())
-sys.path.append(os.path.join(homedir, './Dependencies'))
-import Pmw
 import MolecularSystem
 import parms
 import SystemMemory
-#sys.path.append(os.path.join(homedir, './Tools/SequenceFetcher'))
-#import SequenceFetcher
+
+# tool imports
+import SPADE
+import Tools.DetectDomains
+import Tools.Selection.SystemSelectionDialog
+import Tools.Aligner.SequenceAligner
+import Tools.ConservationTools
+from MolecularComponents.classFutamuraHash import FutamuraHash 
 
 verbose = 0
-import string
 
 class MolecularViewer(Frame):             # Molecular Viewer
     def __init__(self, parent, system, ht=400, wd=500, menu=1, skip_update=1, undoredo=1):
@@ -61,9 +45,9 @@ class MolecularViewer(Frame):             # Molecular Viewer
         if menu == 1:
             self.has_menu = 1
             self._build_menu()
-        #self.screen = vtk.tk.vtkTkRenderWindowInteractor(parent, width=wd, height=ht)
-        self.screen = vtk.tk.vtkTkRenderWidget.vtkTkRenderWidget(parent, width=wd, height=ht)
-        win = self.screen.GetRenderWindow()
+        self.screen = pyvista.Plotter(window_size=(wd, ht))
+        win = self.screen.render_window
+        #self.screen = vtk.tk.vtkTkRenderWidget.vtkTkRenderWidget(parent, width=wd, height=ht)
         # these look interesting, but I didn't see any difference with them
         #win.PointSmoothingOn()
         #win.LineSmoothingOn()
@@ -75,15 +59,18 @@ class MolecularViewer(Frame):             # Molecular Viewer
         #
         self.renderer = vtk.vtkRenderer()
         self.renderer.GetActiveCamera().GlobalWarningDisplayOff()
-        self.screen.GetRenderWindow().AddRenderer(self.renderer)
+        self.screen.render_window.AddRenderer(self.renderer)
         self.menuBar.pack(fill='x', side='top', expand=NO)
-        self.screen.pack(side=TOP, expand=YES, fill=BOTH)
+        #self.screen.pack(side=TOP, expand=YES, fill=BOTH)
+        self.interactor = vtkTkRenderWindowInteractor(self, rw=self.screen.render_window, width=wd, height=ht)
+        self.interactor.Initialize()
+        self.interactor.pack(side=TOP, expand=YES, fill=BOTH)
+        self.interactor.Start()
         self.busy_label.pack(side=TOP, anchor=W, expand=NO)
         start_time = time.clock()
-        print 'creating the view  ',
         self.visitor = GraphicsVisitor(None, self)
         self.renderer.ResetCamera()
-        self.screen.Render()
+        self.screen.render()
         #self._set_lights()
         if self.undoredo_toggle:
             if self.system and self.system != 'None':
@@ -95,7 +82,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
         self.graphics_memory_index = 0
         self.selection_memory_index = 0
         self.has_icon_file = 0
-        print 'done creating view%5.3f seconds'%(end_time - start_time)
         if self.system and self.system != 'None':
             self.loadSystem(self.system, skip_update)
         self.busy_text.set('Ready')
@@ -158,10 +144,8 @@ class MolecularViewer(Frame):             # Molecular Viewer
         cnt = actors.GetNumberOfItems()
         for i in range(0,cnt):
             self.renderer.RemoveActor(actors.GetLastActor())
-        print 'graphics visitor'
         #self.visitor = GraphicsVisitor(system, self)
         self.visitor.load_system(system, 0)
-        print 'done visitor'
         self.renderer.ResetCamera()
         # if no icon has been created, create now
         icon_filename = self.system.get_filename_by_extension('jpg')
@@ -185,7 +169,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
         self.busy_label.update()
         last_selection_memory = self.selection_memories[self.selection_memory_index]
         last_graphics_memory  = self.graphics_memories[self.graphics_memory_index]
-        print 'updating the view  ',
         self.visitor.visit(last_selection_memory, last_graphics_memory)
         if self.undoredo_toggle:
             # undo/redo stuff can be disabled because of its slowness
@@ -199,7 +182,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
             self.selection_memory_index += 1
         self.screen.Render()
         end_time = time.clock()
-        print 'done %5.3f seconds'%(end_time - start_time)
         self.busy_text.set('Ready')
         self.busy_label.update()
 
@@ -208,7 +190,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
         
     def undo(self, load_initial=0):
         if self.graphics_memory_index == 0:
-            print 'out of do\'s to undo'
             return
         else:
             # don't erase the first memory -- that's the initial state
@@ -331,11 +312,9 @@ class MolecularViewer(Frame):             # Molecular Viewer
     def toggle_trace_transparency(self):
         # define a function to pass to the selection dialog
         def exit_function(viewer, parms, top=None, snap=None):
-            print 'executing exit function'
             for pchain in viewer.system.ProteinList:
                 for res in pchain.residues:
                     if res.selected:
-                        print 'res %s %s selected for opacity'%(res.res_type1, res.res_number)
                         res.vtk_arg_list['trace']['opacity'] = 0.2
                     else:
                         res.vtk_arg_list['trace']['opacity'] = 1.0
@@ -354,7 +333,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
             for pol in self.system.PolymerList:
                 for res in pol.residues:
                     if res.vtk_arg_list['trace']['opacity'] < 1.0:
-                        print 'opaque residue %s'%(res.res_number)
                         res.select()
                 
             selection_top = Toplevel()
@@ -385,11 +363,9 @@ class MolecularViewer(Frame):             # Molecular Viewer
     def toggle_volume_transparency(self):
         # define a function to pass to the selection dialog
         def exit_function(viewer, parms, top=None, snap=None):
-            print 'executing exit function'
             for pchain in viewer.system.ProteinList:
                 for atom in pchain.atoms:
                     if atom.selected:
-                        print 'atom %s %s selected for opacity'%(atom.atom_type, atom.atom_number)
                         atom.vtk_arg_list['volume']['opacity'] = 0.1
                     else:
                         atom.vtk_arg_list['volume']['opacity'] = 1.0
@@ -408,7 +384,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
             for pol in self.system.PolymerList:
                 for atom in pol.atoms:
                     if atom.vtk_arg_list['volume']['opacity'] < 1.0:
-                        print 'opaque atom %s'%(atom.atom_number)
                         atom.select()
                 
             selection_top = Toplevel()
@@ -459,7 +434,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
         All residues or atoms in each protein need to have the value. The value should
         be a digit. If not normalized, a new feature will be added which appends '_normalized'
         to the key """
-        print 'adding color menu'
         self.menuBar.addcascademenu('Color', 'Color Atoms'); 
         c_lambda = lambda: self.color_wireframe('cpk');
         self.menuBar.addmenuitem('Color Atoms','command','Color wireframes cpk', command=c_lambda, label='cpk')
@@ -509,13 +483,11 @@ class MolecularViewer(Frame):             # Molecular Viewer
                             try:
                                 feature = item.features[key]
                             except KeyError:
-                                print 'key error on %s, breaking'%(key)
                                 broken = 1
                                 break
                             try:
                                 int(feature)
                             except ValueError:
-                                print '%s not digit, breaking'%(feature)
                                 broken = 1
                                 break
                             else:
@@ -524,7 +496,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
                             if feature == first_val:
                                 same_val_count += 1
                             if same_val_count == len(item_list):
-                                print '%s all the same value; breaking'%(key)
                                 broken = 1
                                 break
                             if key == 'domain':
@@ -589,11 +560,11 @@ class MolecularViewer(Frame):             # Molecular Viewer
                 last_domain = domain
         ends.append(len(pchain.residues))
         if len(domains) > 1:
-            print 'chain %s has %s domains'%(pchain.chain_name, len(domains))
+            print(f"chain {pchain.chain_name} has {len(domains)} domains")
         else:
-            print 'chain %s has 1 domain'%(pchain.chain_name)
+            print(f"chain {pchain.chain_name} has 1 domain")
         for i in range(len(domains)):
-            print 'd%s %s - %s'%(domains[i], starts[i], ends[i])
+            print(f"d{domains[i]} {starts[i]} - {ends[i]}")
             
     def toggle_undoredo(self):
         if self.undoredo_toggle:
@@ -751,7 +722,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
     def display(self, type, onoff):
         # define a function to pass to the selection dialog
         def exit_function(viewer, parms, top=None, snap=None):
-            print 'executing exit function'
             listdict = {'system':self.system,
                         'trace':self.system.PolymerList,
                         'atoms':self.system.MoleculeList,
@@ -883,7 +853,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
         
     
     def save_image(self):
-        strg = tkFileDialog.asksaveasfilename(title = 'Save as', defaultextension='.jpg', filetypes=[("JPEG", "*.jpg"),
+        strg = filedialog.asksaveasfilename(title = 'Save as', defaultextension='.jpg', filetypes=[("JPEG", "*.jpg"),
                                                                                       ("PostScript", "*.ps"),
                                                                                       ("PNG", "*.png"),
                                                                                       ("BMP", "*.bmp"),
@@ -946,7 +916,6 @@ class MolecularViewer(Frame):             # Molecular Viewer
         #a.add_target(self.system.ProteinList[0])
         #a.add_template(self.system.ProteinList[1])
         #pid = a.align_sequences()
-        #print '%5.3f percent identity between chains %s and %s'%(pid, self.system.ProteinList[0].chain_name, self.system.ProteinList[1].chain_name)
         
         self.rebuild_color_menu()
 
@@ -1339,7 +1308,6 @@ class GraphicsVisitor:
     """  draw  """
     def draw_molecule(self, type, obj, actor):
         if actor == None:
-            print 'creating new actor'
             actor = vtk.vtkActor()
             if type in ['trace','volume','hbonds']:
                 actor.GetProperty().SetSpecular(obj.vtk_arg_list[type]['specular'])
@@ -1357,11 +1325,9 @@ class GraphicsVisitor:
             if obj.vtk_arg_list['hbonds']['representation'] == 'lines':
                 return self._draw_lines_for_hbonds(obj, actor)
             elif obj.vtk_arg_list['hbonds']['representation'] == 'tubes':
-                print 'here4'
                 return self._draw_tubes_for_hbonds(obj, actor)
         elif type == 'atoms':
             if obj.vtk_arg_list['atoms']['representation'] == 'wireframe':
-                print 'about to draw wireframe'
                 return self._draw_wireframe_for_molecule(obj, actor)
             elif obj.vtk_arg_list['atoms']['representation'] == 'sticks':
                 return self._draw_sticks_for_molecule(obj, actor)
@@ -1369,7 +1335,6 @@ class GraphicsVisitor:
                 return self._draw_spheres_for_molecule(obj, actor)
         elif type == 'volume':
             return self._draw_volume_for_molecule(obj, actor)
-        print 'done %s'%(type)
         
     """  lookup tables  """
     def build_lookup_table(self, obj, type):
@@ -1443,8 +1408,7 @@ class GraphicsVisitor:
                 color = res.vtk_arg_list['trace']['color']
                 res.visible = 1
                 opacity = res.vtk_arg_list['trace']['opacity']
-                if opacity != 1.0:
-                    print 'res %s %s going opaque'%(res.res_type1, res.res_number)
+            if opacity != 1.0:
                 luTable.SetTableValue(index, color[0], color[1], color[2], opacity)
             else:
                 luTable.SetTableValue(index, 1.0,1.0,1.0,1.0)
@@ -1662,7 +1626,6 @@ class GraphicsVisitor:
         return actor
         
     def _draw_tubes_for_hbonds(self, system, actor):
-        print 'in draw sticks for hbonds'
         hbond_count = len(system.HBonds)
 
         hbond_line_points = vtk.vtkPoints()
@@ -1853,7 +1816,6 @@ class GraphicsVisitor:
 
 
     def _draw_tube_for_polymer(self, polymer, actor):
-        print 'drawing tube for polymer'
         try:
             self.polymer_splines[polymer.chain_name]
         except:
@@ -1965,7 +1927,7 @@ class GraphicsVisitor:
                 self.polymer_splines[polymer.chain_name]['z'].AddPoint(id_cntr, zpt)
                 id_cntr = id_cntr + 1
             else:
-                print 'missing central point for %s'%(rez.res_number)
+                print(f"missing central point for {rez.res_number}")
         
     """  surface rendering  """
     def _draw_volume_for_molecule(self, mol, actor, forced_rewrite=0):
@@ -2027,7 +1989,6 @@ class GraphicsVisitor:
                   'H':1.17,
                   'Z':3.0}
         default_distance = 1.8
-        print 'locating nearest atoms'
         scalars = vtk.vtkIntArray()
         scalars.SetNumberOfComponents(1)
         # now locate the intersections
@@ -2173,7 +2134,6 @@ class GraphicsVisitor:
                   'Z':solvent_radius + 3.0}
         default_distance = solvent_radius + 1.8
         # create spheres for each atom
-        print 'collecting surface points'
         total_points = 0
         surface_points = []
         point_count = sphere_res
@@ -2204,7 +2164,7 @@ class GraphicsVisitor:
                     else:
                         surface_points.append([x_store,y_store,z_store])
                     
-        print '%s water centers collected (of %s - %s speedup hits)'%(len(surface_points), len(mol.atoms)*point_count, speedup_hits)
+        print(f"{len(surface_points)} water centers collected (of {len(mol.atoms)*point_count} - {speedup_hits} speedup hits)")
         return surface_points
                 
     def _chomp_futamura_surface(self, mol, volume_actor, sphere_res, solvent_radius, surf_res, back_fit_points = 1):
@@ -2248,7 +2208,6 @@ class GraphicsVisitor:
         theSurfaceEqn.SetOperationTypeToDifference()
         theSurfaceEqn.AddFunction(theCream)
         theSurfaceEqn.AddFunction(theChomps)
-        print 'sampling the difference'
 
         theSurfaceMap = vtk.vtkSampleFunction()
         theSurfaceMap.SetImplicitFunction(theSurfaceEqn)
@@ -2282,7 +2241,7 @@ class GraphicsVisitor:
             final_points.append(x.GetPoint(i))
             final_copy.append(x.GetPoint(i))
             
-        print '%s final points'%(len(final_points))
+        print(f"{len(final_points)} final points")
         
         luTable = self._build_surface_lookup_table(mol)
         # forces the point back to a precise distance from the closest atom (or sometimes
@@ -2291,7 +2250,7 @@ class GraphicsVisitor:
             scalars = self._get_surface_color_scalars(mol, 0.8, final_points, 0)
         else:
             scalars,new_points = self._get_surface_color_scalars(mol, 0.8, final_points, 1)
-            print '%s final points, %s new_points'%(len(final_points), len(new_points))
+            print(f"{len(final_points)} final points, {len(new_points)} new_points")
 
             new_vtk_points = vtk.vtkPoints()
             for point_ind in range(len(new_points)):
@@ -2335,7 +2294,6 @@ class GraphicsVisitor:
         return volume_actor
 
 if __name__ == '__main__':
-    from tkFileDialog import *
     def reload_viewer(viewer, type):
         if type == 'pdb':
             new_name = askopenfilename(title = 'Select the PDB', defaultextension='.pdb', filetypes=[("Protein Data Bank", "*.pdb"),("all files", "*")])
@@ -2356,7 +2314,7 @@ if __name__ == '__main__':
     def print_system_info(viewer):
         for line in viewer.system.HeaderLines:
             if line[0:5] in ['HEADE', 'TITLE', 'COMPN', 'SOURC', 'KEYWD']:
-                print line
+                print(line)
 
     window = Tk()
     viewer = MolecularViewer(window, 'None', 400, 500, 0)
@@ -2372,7 +2330,7 @@ if __name__ == '__main__':
                 viewer.closeSystem()
                 viewer.loadSystem(new_system)
         else:
-            print 'file %s does not exist'%(new_name)
+            print("file {new_name} does not exist")
     
     viewer.menuBar.addmenu('File', 'Load/Unload systems')
     c_lambda = lambda viewer=viewer: reload_viewer(viewer, 'pdb')

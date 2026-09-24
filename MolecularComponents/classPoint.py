@@ -9,7 +9,7 @@ class Point:
         self.y = y
         self.z = z
     def pdb_print(self):
-        print "%7.3f %7.3f %7.3f" % (self.x, self.y, self.z)
+        print(f"{self.x:7.3f} {self.y:7.3f} {self.z:7.3f}")
     def get_coordinate_list(self):
         new_list = []
         new_list.append(self.x)

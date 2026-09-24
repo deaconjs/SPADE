@@ -274,17 +274,17 @@ class Molecule:
         if coor_list[0] != self.res_type or int(coor_list[1]) != self.res_number:
             if len(string.strip(self.chain_name)) > 0:
                 if coor_list[2] != self.chain_name:
-                    print "problem loading: %s%d and %s%d different"%(coor_list[0], int(coor_list[1]), self.res_type, self.res_number)
+                    print(f"problem loading: {coor_list[0]}{int(coor_list[1])} and {self.res_type}{self.res_number} different")
                     return -1
             else:
-                print "problem loading: %s%d and %s%d different"%(coor_list[0], int(coor_list[1]), self.res_type, self.res_number)
+                print(f"problem loading: {coor_list[0]}{int(coor_list[1])} and {self.res_type}{self.res_number} different")
                 return -1
         if len(string.strip(self.chain_name)) == 0:
             offset = 2
         else:
             offset = 3
         if len(coor_list) != (len(self.atoms)*3)+offset:
-            print "problem loading: %d and %d different numbers of atoms?"%(len(coor_list), (len(self.atoms)*3)+offset)
+            print(f"problem loading: {len(coor_list)} and {(len(self.atoms)*3)+offset}")
             return -1
         distances = []
         for i in range(0,(len(self.atoms))):
@@ -301,7 +301,7 @@ class Molecule:
         grid = FutamuraHash(self, outside_barrier, grid_spacing)
         T = grid.T
         block_assignments = grid.atom_block_assignments
-        print 'locating intersections'
+        print("locating intersections")
         # now locate the intersections
         x_table = {}
         radii  = {'C':solvent_radius + 1.75,
@@ -368,7 +368,7 @@ class Molecule:
         if create_new:
             if self.x_table == None:
                 self.build_futamura_intersection_table(distance_cutoff)
-            print 'filling densities'
+            print("filling densities")
             atom_count = 0.0
             densities = []
             max_count = 0

@@ -8,9 +8,8 @@ import copy
 import math
 import random
 import string
-print 'string value %s'%(string)
+
 # internal imports
-sys.path.append(os.getcwd())
 from MolecularComponents.classAtom            import Atom
 from MolecularComponents.classMolecule        import Molecule
 from MolecularComponents.classWater           import Water
@@ -22,9 +21,9 @@ from MolecularComponents.classProtein         import Protein
 from MolecularComponents.classNucleotideChain import NucleotideChain
 from MolecularComponents.classPoint           import Point
 from MolecularComponents.classFutamuraHash    import FutamuraHash
+
 # dependency import
 #from scipy import *
-print 'string value %s'%(string)
 import MolecularComponents.MathFunc
 verbose = 0
 
@@ -54,7 +53,7 @@ class System:
         elif type in ['PDB', 'ENT']:
             self.load_pdb(filename, 1)
         else:
-            print 'did not recognize the file type as .pdb, .ent, or .sps'
+            print("did not recognize the file type as .pdb, .ent, or .sps")
         self.vtk_arg_list = {}
         hbond_args   = {'visualize':0,
                         'currently_on':0,
@@ -66,8 +65,6 @@ class System:
         self.vtk_arg_list['hbonds']  = hbond_args
 
     def load_pdb(self, filename, silent=0):
-        if not silent:
-            print "Opening pdb file %s\n"%(os.path.split(filename)[1])
         """ parse a pdb file and load it as a system object."""
         self.filename = filename
         self.selected = 1
@@ -109,9 +106,9 @@ class System:
                 self.header = string.strip(line[6:])
                 
         if verbose:
-            print "%d atoms" % len(ATOMlines)
-            print "%d hetero atoms" % len(HETATMlines)
-            print "%d header lines" % len(otherlines)
+            print(f"{len(ATOMlines)} atoms")
+            print(f"{len(HETATMlines)} hetero atoms")
+            print(f"{len(otherlines)} header lines")
 
         # next make a list of lines for the amino acids and nucleotides
         AATypes = parms.get('AATypes')
@@ -169,9 +166,9 @@ class System:
                     NUCchainlist.append(line[21:22])
             if verbose:
                 if len(NUCchainlist) == 1:
-                    print "1 nucleotide chain loading"
+                    print("1 nucleotide chain loading")
                 else:
-                    print "%d nucleotide chains loading" % len(NUCchainlist)
+                    print(f"{len(NUCchainlist)} nucleotide chains loading")
             # and create a list for each
             separatedlists = []
             for chainname in NUCchainlist:
@@ -210,9 +207,9 @@ class System:
                 mol_names.append(mol.res_type)
             if verbose:
                 if len(self.LigandList) == 1:
-                    print "1 ligand molecule %s" % (mol_names)
+                    print(f"1 ligand molecule {mol_names}")
                 else:
-                    print "%d ligand molecules %s" % (len(self.LigandList), mol_names)
+                    print(f"{len(self.LigandList)} ligand molecules {mol_names}")
 
         # once ligands have been read in, then process the water list
         # so that they can be numbered sequentially
@@ -235,9 +232,9 @@ class System:
                 self.WaterList.append(new_molecule)
             if verbose:
                 if len(self.WaterList) == 1:
-                     print "1 water molecule"
+                     print("1 water molecule")
                 else:
-                    print "%d water molecules" % (len(self.WaterList))
+                    print(f"{len(self.WaterList)} water molecules")
         PDBfile.close()
         self._supplementary_initialization(silent)
 
@@ -307,7 +304,7 @@ class System:
         for chain in self.PolymerList:
             reslen += len(chain.residues)
         if not silent:
-            print 'loaded %s atoms and %s residues in %d polymers, %d ligands, %d waters'%(self.atom_count, reslen, len(self.PolymerList), len(self.LigandList), len(self.WaterList))
+            print(f"loaded {self.atom_count} atoms and {reslen} residues in {len(self.PolymerList)} polymers, {len(self.LigandList)} ligands, {len(self.WaterList)} waters")
                 
     def add_protein(self, prot):
         self.ProteinList.append(prot)
@@ -357,7 +354,7 @@ class System:
             regx = re.compile ("^\d*$")
         hyd_present = 1
         target_chain = self.PolymerDict[chain_name]
-        target_res = target_chain.residues_dict['%s'%(res_number)] 
+        target_res = target_chain.residues_dict[f"{res_number}"] 
         for atom in target_res.atoms:
             if atom.atom_type[0] == 'H':
                 if regx.match(atom.atom_type[1:]):
@@ -371,14 +368,13 @@ class System:
          
         atom_number = 0
         if hyd_present >= 2:
-            atom_type   = 'H' + atom_place + '%s'%(hyd_present)
+            atom_type   = 'H' + atom_place + f"{hyd_present}"
         else:
             atom_type   = 'H' + atom_place
         res_type    = target_res.res_type
         x,y,z = coordinates_list[0], coordinates_list[1], coordinates_list[2]
-        new_atom = Atom(target_chain.residues_dict['%s'%(res_number)],\
-                        "ATOM %6s%5s %3s %1s%4s %11.3f %7.3f %7.3f%26s\n"\
-                        %(atom_number,atom_type,res_type,chain_name,res_number,x,y,z, " "))
+        new_atom = Atom(target_chain.residues_dict[f"{res_number}"],\
+                        f"ATOM {atom_number:>6}{atom_type:>5} {res_type:>3} {chain_name:>1}{res_number:>4} {x:11.3f} {y:7.3f} {z:7.3f}{space:>26}\n")
         new_atom.data['parent_molecule'] = target_res
         # can just insert into the residue's dictionary
         target_res.atoms_dict[new_atom.atom_type] = new_atom
@@ -448,8 +444,8 @@ class System:
                 # Cannot hbond to yourself
                 if (donor['donorAtom'] == acceptor['accAtom']):
                     continue
-                pair1 = '%s_%s'%(acceptor['accAtom'].atom_number, donor['donorAtom'].atom_number)
-                pair2 = '%s_%s'%(donor['donorAtom'].atom_number, acceptor['accAtom'].atom_number)
+                pair1 = f"{acceptor['accAtom'].atom_number}_{donor['donorAtom'].atom_number}"
+                pair2 = f"{donor['donorAtom'].atom_number}_{acceptor['accAtom'].atom_number}"
                 for hydAtom in donor['hydAtoms']:
                     if hydAtom.dist(acceptor['accAtom']) > 3.0:
                         continue
@@ -467,7 +463,7 @@ class System:
                         donor['donorAtom'].Donor_HBonds.append(hbond)
                         self.HBonds.append (hbond)
 
-        print 'located %s hbonds'%(len(self.HBonds))
+        print(f"located {self.HBonds} hbonds")
 
     def calculate_block_function_strength(self, HBondInfo):
         # calculate strengths
@@ -538,8 +534,6 @@ class System:
         else:
             HBondInfo['angle_D_A_AA'] = 'Water'
             HBondInfo['angle_H_A_AA'] = 'Water'
-
-            
         return HBondInfo
 
     def is_valid_hbond (self,HBondInfo,strict=True):
@@ -614,8 +608,6 @@ class System:
                
     def save_pdb(self, filename="tmp.pdb"):
         """ write out the structure to the given file name, in pdb-style """
-        if verbose:
-            print "currently only printing the protein atom lines"
         pdb_file = open(filename, 'w')
         pdb_file.writelines(self.HeaderLines)
         for pchain in self.ProteinList:
@@ -671,7 +663,6 @@ class System:
                 
     def load_system(self, filename):
         self.filename = filename
-        print 'opening %s'%(os.path.split(filename)[1])
         new_file = open(filename, 'r')
         save_dict = pickle.load(new_file)
         self.filename = save_dict['filename']
@@ -701,7 +692,6 @@ class System:
         if ext == None:
             i = af[0:index].rfind(os.sep)
             return af[0:i]
-        
         if chain_name == 'None':
             if ext[0] == ".":
                 df = af[0:index] + ext
@@ -712,7 +702,6 @@ class System:
                 df = af[0:index] + chain_name + ext
             else:
                 df = af[0:index] + chain_name + "." + ext
-            
         return df
 
     def get_bounds(self):
@@ -756,7 +745,6 @@ class System:
     def normalize_b_factors(self):
         max_b = 0.0
         min_b = 1000.0
-        print 'normalizing b factors'
         if self.MoleculeList[0].atoms[0].b_factor != None:
             for mol in self.MoleculeList:
                 for atom in mol.atoms:
@@ -764,7 +752,7 @@ class System:
                         min_b = atom.b_factor
                     if atom.b_factor > max_b:
                         max_b = atom.b_factor
-            print 'b_factor range %s %s'%(min_b, max_b)
+            print(f"b_factor range {min_b} {max_b}")
             if max_b != 0.0:
                 for mol in self.MoleculeList:
                     for atom in mol.atoms:
@@ -772,12 +760,11 @@ class System:
                             atom.features['b_factor'] = 0.0
                         else:
                             atom.features['b_factor'] =(atom.b_factor-(0.5*max_b)) / (max_b-(0.5*max_b))
-                            print atom.features['b_factor']
     
     def log_b_factors(self):
         max_b = 0.0
         min_b = 1000.0
-        print 'log of b factors'
+        print("log of b factors")
         if self.MoleculeList[0].atoms[0].b_factor != None:
             for mol in self.MoleculeList:
                 for atom in mol.atoms:
@@ -790,15 +777,15 @@ class System:
         filename = self.get_filename_by_extension('.bsa')
         create_new = 0
         if forced_rewrite:
-            print 'forced rewrite'
+            print("forced rewrite")
             create_new = 1
         else:
             try:
                 asa_file = open(filename)
-                print 'opening %s'%(filename)
+                print(f"opening {filename}")
             except IOError:
                 create_new = 1
-                print 'creating new'
+                print("creating new")
         if create_new:
             sphere_res = 15
             if self.x_table == None:
@@ -827,7 +814,7 @@ class System:
                             z_store = z + atom.z
                             externally_broken = 0
                             # see if the point is blocked by any other atoms
-                            for second_atom in x_table['%s'%(atom.atom_number)]:
+                            for second_atom in x_table[f"{atom.atom_number}"]:
                                 if math.sqrt(pow(x_store-second_atom[0],2) + pow(y_store-second_atom[1],2) + pow(z_store-second_atom[2],2)) <= second_atom[3]: # second_atom[3] is rad+solv_rad
                                     # if the point is within range of a second atom,
                                     # dont count it if its blocked by a covalent bond
@@ -858,12 +845,12 @@ class System:
                     res.features['system_asa'] = (total_points-intra_inaccessible) / (total_points)
                     res.features['system_sidechain_asa'] = (total_side-side_intra) / (total_side)
                     if verbose:
-                        print 'res %s%s - %5.2f accessible, %5.2f sidechain'%(res.res_number, res.res_type, res.features['system_asa'], res.features['system_sidechain_asa'])
+                        print(f"res {res.res_number}{res.res_type} - {res.features['system_asa']} accessible, {res.features['system_sidechain_asa']} sidechain")
                 
             asa_file = open(filename, 'w')
             for pchain in self.ProteinList:
                 for rex in range(len(pchain.residues)):
-                    asa_file.write("%s %5.3f %5.3f\n"%(pchain.residues[rex].res_number, pchain.residues[rex].features['system_asa'], pchain.residues[rex].features['system_sidechain_asa']))
+                    asa_file.write(f"{pchain.residues[rex].res_number} {pchain.residues[rex].features['system_asa']:5.3f} {pchain.residues[rex].features['system_sidechain_asa']:5.3f}\n")
             asa_file.close()
         else:           # else read the contacts_file to fill the contact_list
             for pchain in self.ProteinList:
@@ -940,7 +927,7 @@ class System:
                     closest_chain = None
                     closest_distance = 1000
                     for atom in res.atoms:
-                        for intersection in self.x_table['%s'%(atom.atom_number)]:
+                        for intersection in self.x_table[f"{atom.atom_number}"]:
                             if intersection[5] != atom.chain_name:
                                 if intersection[7] < closest_distance:
                                     closest_distance = intersection[7]
@@ -958,7 +945,7 @@ class System:
                     closest_chain = None
                     closest_distance = 1000
                     for atom in res.atoms:
-                        for intersection in self.x_table['%s'%(atom.atom_number)]:
+                        for intersection in self.x_table[f"{atom.atom_number}"]:
                             if intersection[5] != atom.chain_name:
                                 if intersection[7] < closest_distance:
                                     closest_distance = intersection[7]
@@ -979,15 +966,14 @@ class System:
                         rui += res.features['differential_asa'] *  res.data['exposed_area']
                     elif asa_style == 'asa':
                         rui += res.features['differential_sidechain_asa'] *  res.data['exposed_sidechain_area']
-                    #print '%s%s %s, '%(res.res_type1, res.res_number, res.features['normalized_0D_conservation'])
-            print '\n%5.2f angstroms under interface %s'%(rui, pchain.chain_name)
+            print(f"\n{rui} angstroms under interface {pchain.chain_name}")
         
     def calculate_interface_significance(self, asa_style):
         # assumes calculate_differential_system_asa has been called
         outfile = open('./interface_results.txt', 'a')
         for pchain in self.ProteinList:
-            line = '\ntesting chain %s pdb %s'%(pchain.chain_name, self.filename)
-            print line
+            line = f"testing chain {pchain.chain_name} pdb {self.filename}"
+            print(line)
             outfile.write(line+'\n')
             total_sum = 0.0
             rui = 0.0
@@ -997,12 +983,12 @@ class System:
                         rui += res.features['differential_asa'] *  res.data['exposed_area']
                     elif asa_style == 'asa':
                         rui += res.features['differential_sidechain_asa'] *  res.data['exposed_sidechain_area']
-                    line = '%s%s %s, '%(res.res_type1, res.res_number, res.features['normalized_0D_conservation'])
-                    print line
+                    line = f"{res.res_type1}{res.res_number} {res.features['normalized_0D_conservation']}"
+                    print(line)
                     outfile.write(line+'\n')
 
-            line = '%5.2f angstroms under interface %s'%(rui, pchain.chain_name)
-            print line
+            line = f"{rui} angstroms under interface {pchain.chain_name}"
+            print(line)
             outfile.write(line+'\n')
             
             tokens = ['normalized_0D_conservation', 'normalized_noactsit_0D_conservation', 'normalized_1D_conservation', 'normalized_3D_conservation', 'normalized_ms3D_conservation', 'normalized_noactsit_ms3D_conservation', 'normalized_nobadloop_ms3D_conservation']
@@ -1022,7 +1008,7 @@ class System:
                 if count > 0:
                     average = sum / count
                 else:
-                    print 'no residues in the interface'
+                    print("no residues in the interface")
                     continue
 
                 monitor = []
@@ -1043,11 +1029,11 @@ class System:
                         count2 += 1
                     if average >= sum/count2:
                         wins += 1
-                line = 'chain %s %s (%s residues - %s) wins %4.1f percent of the time'%(pchain.chain_name, token, int(count), average, 100.0*wins/float(times))
-                print line
+                line = f"chain {pchain.chain_name} {token} ({int(count)} residues - {average}) wins {100.0*wins/float(times)} percent of the time"
+                print(line)
                 outfile.write(line+'\n')
                 total_sum += 100.0*wins/float(times)
-            print 'chain %s interface averages %s over the methods'%(pchain.chain_name, total_sum/5.0)
+            print(f"chain {pchain.chain_name} interface averages {total_sum/5.0} over the methods")
         outfile.close()
         
     def build_futamura_intersection_table(self, solvent_radius):        
@@ -1077,13 +1063,13 @@ class System:
         grid = FutamuraHash(fakemol, outside_barrier, grid_spacing)
         T = grid.T
         block_assignments = grid.atom_block_assignments
-        print 'locating intersections'
+        print("locating intersections")
         # now locate the intersections
         x_table = {}
         for atom in fakemol.atoms:
-            x_table['%s'%(atom.atom_number)] = []
+            x_table[f"{atom.atom_number}"] = []
             r1 = solvent_radius + atom.radius
-            block = block_assignments['%s'%(atom.atom_number)]
+            block = block_assignments[f"{atom.atom_number}"]
             key_tokens = string.split(block)
             keys = [string.atoi(key_tokens[0]), string.atoi(key_tokens[1]), string.atoi(key_tokens[2])]
             # put 'this' block first, so that intersection table accesses search here first
@@ -1091,7 +1077,7 @@ class System:
                 if atom != second_atom:
                     r2 = solvent_radius + second_atom.radius
                     if atom.dist(second_atom) <= r1+r2:
-                        x_table['%s'%(atom.atom_number)].append([second_atom.x,second_atom.y,second_atom.z, r2, second_atom.res_number, second_atom.chain_name, second_atom.atom_type, atom.dist(second_atom)])
+                        x_table[f"{atom.atom_number}"].append([second_atom.x,second_atom.y,second_atom.z, r2, second_atom.res_number, second_atom.chain_name, second_atom.atom_type, atom.dist(second_atom)])
             
             start_array = [0,0,0]
             end_array   = [0,0,0]
@@ -1111,7 +1097,7 @@ class System:
             for i in range(start_array[0], end_array[0]):
                 for j in range(start_array[1], end_array[1]):
                     for k in range(start_array[2], end_array[2]):
-                        key2 = '%s %s %s'%(i,j,k)
+                        key2 = f"{i} {j} {k}"
                         if key2 == block:
                             continue            # did this one earlier
                         if key2 in T.keys():
@@ -1119,7 +1105,7 @@ class System:
                                 if atom != second_atom:
                                     r2 = solvent_radius + second_atom.radius
                                     if atom.dist(second_atom) <= r1+r2:
-                                        x_table['%s'%(atom.atom_number)].append([second_atom.x,second_atom.y,second_atom.z, r2, second_atom.res_number, second_atom.chain_name, second_atom.atom_type, atom.dist(second_atom)])
+                                        x_table[f"{atom.atom_number}"].append([second_atom.x,second_atom.y,second_atom.z, r2, second_atom.res_number, second_atom.chain_name, second_atom.atom_type, atom.dist(second_atom)])
         self.x_table = x_table
         
         
@@ -1162,7 +1148,6 @@ class ModificationSystem(System):
         if return_count == 0:        # an empty list
             return []
         qw             = string.atof(queryweight)
-        #print "looking for %s"%(queryweight)
         frag_index     = 0
         nearest_index  = 0
         furthest_saved_dist = 1000000000.0

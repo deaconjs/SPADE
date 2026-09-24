@@ -1,3 +1,0 @@
-import Aligner
-import SequenceAligner
-import StructureAligner

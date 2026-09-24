@@ -2,7 +2,7 @@ import sys
 import os
 import string
 import parms
-import copy
+from copy import deepcopy
 import numpy
 import math
 import random
@@ -14,8 +14,8 @@ from MolecularComponents.classPoint import Point
 from MolecularComponents.classFutamuraHash import FutamuraHash
 from MolecularComponents.classMolecule import Molecule
 
-from MathFunc import *
-from HBondFunc import *
+from MolecularComponents.MathFunc import *
+from Tools.HBond.HBondFunc import *
 
 verbose = 0
 
@@ -82,7 +82,7 @@ class Protein(Polymer):
         self.locate_termini()
         self.residues_dict = {}
         for res in self.residues:
-            self.residues_dict['%s'%(res.res_number)] = res
+            self.residues_dict[f"{res.res_number}"] = res
         #self.fill_pseudo_sidechains(0)
         #self.fill_neighbors_lists()
         #self.assign_ss_from_header()
@@ -95,7 +95,7 @@ class Protein(Polymer):
 
     def print_sequence(self):
         x = self.get_sequence()
-        print x
+        print(x)
                 
     def fill_proteolysis_fragments(self, plys_type, misses_allowed=100000):
         """ fill self.fragment_list. missed_allowed tells how many missed cut sites
@@ -143,7 +143,7 @@ class Protein(Polymer):
                         cut_sites.append(index)
                 index = index + 1
             cut_sites.append(len(self.residues))
-        print "cut sites at",cut_sites
+        print(f"cut sites at {cut_sites}")
         # now use them to make a list of possible fragments
         self.fragment_list    = []          # an array of [weight,start,end]
         for site1_index in range(0,len(cut_sites)):
@@ -161,7 +161,7 @@ class Protein(Polymer):
         keys.sort()
         for key in keys:
             if key > 1000 and key < 10000:
-                print key, fragdict[key]
+                print(key, fragdict[key])
             
     # before using this, use fill_proteolysis_fragments
     # outdated by get_nearest_proteolysis_fragment in MS
@@ -193,7 +193,7 @@ class Protein(Polymer):
                 if not self.residues[rez_index].has_central_pt:
                     continue
                 if self.residues[rez_index].is_Nterm == 1 or self.residues[rez_index].is_Cterm == 1:
-                    self.residues[rez_index].pseudo_sidechain = copy.deepcopy(self.residues[rez_index].central_pt)
+                    self.residues[rez_index].pseudo_sidechain = deepcopy(self.residues[rez_index].central_pt)
                     continue
                 a1 = self.residues[rez_index-1].central_pt
                 a2 = self.residues[rez_index].central_pt
@@ -251,11 +251,11 @@ class Protein(Polymer):
                 for rex2 in range(rex,len(self.residues)):
                     if rex != rex2:
                         distance_list[rex][rex2] = self.residues[rex].pseudo_sidechain.dist(self.residues[rex2].pseudo_sidechain)
-            print 'sorting distance list'
+            print("sorting distance list")
             # now sort the lists -- first create a new 2D array
             sorted_list = numpy.zeros([s,s])
             for rex in range(len(self.residues)):
-                print '.',
+                print('.', end='')
                 taken = numpy.zeros([s])
                 for rex2 in range(len(self.residues)):
                     minDist = 100.0
@@ -270,9 +270,9 @@ class Protein(Polymer):
                         sorted_list[rex][rex2] = saveK
             print
             # calculate shielding
-            print 'calculating shielding'
+            print("calculating shielding")
             for rex in range(len(self.residues)):
-                print '.',
+                print('.', end='')
                 p1a = self.residues[rex].central_pt
                 p1b = self.residues[rex].pseudo_sidechain
                 for rex2 in range(len(self.residues)):
@@ -309,12 +309,12 @@ class Protein(Polymer):
                     # this is the q score
                     contact_list[rex][sorted_list[rex][rex2]] = 20.0 * shielding / (p1b.dist(p2b) + 1.0)
             # write the contacts to a file
-            print 'done shielding'
+            print("done shielding")
             contact_file = open(filename, 'w')
             for rex in range(len(self.residues)):
                 write_string = ""
                 for rex2 in range(rex, len(self.residues)):
-                    write_string = write_string + "%5.3f, "%(contact_list[rex][rex2])
+                    write_string = write_string + f"{contact_list[rex][rex2]:5.3f}"
                 write_string = write_string + '\n'
                 if write_string != '\n':
                     contact_file.write(write_string)
@@ -355,7 +355,7 @@ class Protein(Polymer):
         lengths.sort()
         top_index = int(math.floor(len(self.residues)*0.90))
         bottom_index = int(math.ceil(len(self.residues)*0.10))
-        print 'min %s max %s (%s %s)'%(lengths[bottom_index], lengths[top_index], bottom_index, top_index)
+        print(f"min {lengths[bottom_index]} max {lengths[top_index]} ({bottom_index} {top_index})")
         for rez in self.residues:
             if len(rez.neighbors) > lengths[top_index]:
                 # if the number of neighbors is > the top 90'th, set at top 90'th
@@ -377,7 +377,7 @@ class Protein(Polymer):
         for res in self.residues:
             sum += len(res.neighbors)
         sum /= len(self.residues)
-        print '%5.3f neighbors per residue, on average'%(sum)
+        print(f"{sum:5.3f} neighbors per residue, on average")
 
     def detect_domains(self):
         # make sure neighbors have been calculated
@@ -385,7 +385,7 @@ class Protein(Polymer):
             try:
                 rez.features['shielding']
             except KeyError:
-                print 'calculating neighbors'
+                print("calculating neighbors")
                 self.fill_pseudo_sidechains()
                 self.fill_neighbors_lists()
 
@@ -443,7 +443,7 @@ class Protein(Polymer):
                         z_store = z + atom.z
                         externally_broken = 0
                         # see if the point is blocked by any other atoms
-                        for second_atom in x_table['%s'%(atom.atom_number)]:
+                        for second_atom in x_table[f"{atom.atom_number}"]:
                             # if the point is within range of a second atom from the intersection table,
                             if math.sqrt(pow(x_store-second_atom[0],2) + pow(y_store-second_atom[1],2) + pow(z_store-second_atom[2],2)) <= (second_atom[3]):
                                 if atom.atom_type == 'C' and second_atom[6] == 'N' and second_atom[4]-atom.res_number==1:
@@ -470,11 +470,6 @@ class Protein(Polymer):
                         if atom.atom_type not in ['N', 'C', 'O']:
                             total_sidechain_area += (this_atoms_noncovalent_points/float(point_count)) * areas.get(atom.atom_type[0], default_area)
                         #total_area += (this_atoms_noncovalent_points/float(point_count)) * (4.0/3.0) * 3.141592654 * ((atom.radius+solvent_radius)**3)
-                    #print '%3s%3s total area: %5.1f exposed area: %5.1f percentage %5.2f'%(atom.atom_type,
-                    #                                                                       atom.atom_number,
-                    #                                                                       atoms_area,
-                    #                                                                       this_area,
-                    #                                                                       this_atoms_noncovalent_points/float(point_count))
                     total_points += this_atoms_noncovalent_points
                     last_total_points = this_atoms_noncovalent_points
                     last_intra_inaccess = intra_inaccessible
@@ -485,11 +480,10 @@ class Protein(Polymer):
                 res.features['sidechain_asa'] = (total_side-side_intra) / float(total_side)
                 res.data['exposed_area'] = total_area
                 res.data['exposed_sidechain_area'] = total_sidechain_area
-                print 'res %s%s - perc. asa - %5.2f, %5.2f side; exposed area - %5.2f, %5.2f side'%(res.res_number, res.res_type, res.features['asa'], res.features['sidechain_asa'], res.features['asa']*res.data['exposed_area'], res.features['sidechain_asa']*res.data['exposed_sidechain_area'])
-                
+                print(f"res {res.res_number}{res.res_type} - perc. asa - {res.features['asa']:5.2f}, {res.features['sidechain_asa']:5.2f} side; exposed area - {res.features['asa']*res.data['exposed_area']:5.2f}, {res.features['sidechain_asa']*res.data['exposed_sidechain_area']:5.2f} side")
             asa_file = open(filename, 'w')
             for rex in range(len(self.residues)):
-                asa_file.write("%s %5.3f %5.3f %5.3f %5.3f\n"%(self.residues[rex].res_number, self.residues[rex].features['asa'], self.residues[rex].features['sidechain_asa'], self.residues[rex].data['exposed_area'], self.residues[rex].data['exposed_sidechain_area']))
+                asa_file.write(f"{self.residues[rex].res_number} {self.residues[rex].features['asa']:5.3f} {self.residues[rex].features['sidechain_asa']:5.3f} {self.residues[rex].data['exposed_area']:5.3f} {self.residues[rex].data['exposed_sidechain_area']:5.3f}\n")
             asa_file.close()
         else:           # else read the contacts_file to fill the contact_list
             for rex in range(len(self.residues)):
@@ -689,7 +683,7 @@ class Protein(Polymer):
                 self.atomsHydList.append ({'atom': D, 'hydAtoms': hydAtoms})
                 continue
             elif (len(hydAtoms) != 0 and redo == True):
-                print ("TODO: Add deletion of the current hydrogens")
+                print("TODO: Add deletion of the current hydrogens")
                 continue
       
             # sp2, 1H 2DD
@@ -698,20 +692,20 @@ class Protein(Polymer):
                 DD1Name=proton['protonInfo']['DD1Name']
                 angle_offset=0 # 0 -> DD1-D-H = DD2-D-H
                 if (DD1Name == 'None'):
-                    print "ERROR: No DD1 atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DD1 atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DD1=aa.atoms_dict[DD1Name]
                 if (proton['protonInfo']['angles'] == 'DD1-D-H = DD2-D-H'):
                     DD2Name=proton['protonInfo']['DD2Name']
                     if (DD2Name=='None'):
-                        print "ERROR: No DD2 atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                        print(f"ERROR: No DD2 atom for proton atom# {D.atom_number}, res# {D.res_number}")
                         continue
                     DD2=aa.atoms_dict[DD2Name]
                 elif (proton['protonInfo']['angles'] == '(C-N-H)-(CA-N-H)=4; C CA N H are planar'):
                     prev_aa=proton['prev_aa']
                     DD2Name=proton['protonInfo']['DD2Name']
                     if (DD2Name=='None'):
-                        print "ERROR: No DD2 atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                        print(f"ERROR: No DD2 atom for proton atom# {D.atom_number}, res# {D.res_number}")
                         continue
                     DD2=prev_aa.atoms_dict[DD2Name]
                     angle_offset = 4
@@ -731,12 +725,12 @@ class Protein(Polymer):
                   proton['protonInfo']['bonds'] == '1H 1DD'):
                 DDName=proton['protonInfo']['DD1Name']
                 if (DDName == 'None'):
-                    print "ERROR: No DD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DD=aa.atoms_dict[DDName]
                 DDDName=proton['protonInfo']['DDD1Name']
                 if (DDDName=='None'):
-                    print "ERROR: No DDD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DDD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DDD=aa.atoms_dict[DDDName]
                 # This configuration has two mutually exclusive hydrogen positions
@@ -753,12 +747,12 @@ class Protein(Polymer):
                   proton['protonInfo']['bonds'] == '2H 1DD'):
                 DDName=proton['protonInfo']['DD1Name']
                 if (DDName == 'None'):
-                    print "ERROR: No DD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DD=aa.atoms_dict[DDName]
                 DDDName=proton['protonInfo']['DDD1Name']
                 if (DDDName=='None'):
-                    print "ERROR: No DDD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DDD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DDD=aa.atoms_dict[DDDName]
                 # This configuration has two hydrogen positions
@@ -773,12 +767,12 @@ class Protein(Polymer):
                   proton['protonInfo']['bonds'] == '1H 1DD'):
                 DDName=proton['protonInfo']['DD1Name']
                 if (DDName == 'None'):
-                    print "ERROR: No DD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DD=aa.atoms_dict[DDName]
                 DDDName=proton['protonInfo']['DDD1Name']
                 if (DDDName=='None'):
-                    print "ERROR: No DDD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DDD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DDD=aa.atoms_dict[DDDName]
                 if (proton['protonInfo']['angles'] == 'DD-D-H=110'):
@@ -794,16 +788,15 @@ class Protein(Polymer):
                   proton['protonInfo']['bonds'] == '3H 1DD'):
                 DDName=proton['protonInfo']['DD1Name']
                 if (DDName == 'None'):
-                    print "ERROR: No DD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DD=aa.atoms_dict[DDName]
                 DDDName=proton['protonInfo']['DDD1Name']
-                #print 'proton %s'%(proton['protonInfo'])
                 # special case: N-term glycine doesn't really have a DDDName so continue silently
                 if proton['protonInfo']['aminoAcidName'] == 'N-TERMINUS' and aa.res_type1 == 'G':
                     continue
                 if (DDDName=='None'):
-                    print "ERROR: No DDD atom for proton atom# %d, res# %d"%(D.atom_number,D.res_number)
+                    print(f"ERROR: No DDD atom for proton atom# {D.atom_number}, res# {D.res_number}")
                     continue
                 DDD=aa.atoms_dict[DDDName]
                 hydPos1=findCirclePosition (proton['protonInfo']['D-H'],110,0,D,DD,DDD,True)
@@ -865,7 +858,7 @@ class Protein(Polymer):
                 maxCnt=cnt
 
         if (maxInx < 0):
-            print "ERROR: incorrect index (find_as)"
+            print("ERROR: incorrect index (find_as)")
 
         # Create the list of residues based on the neighborhood selected
         as_residues = [self.residues[as_residue_inxs[maxInx]]]
@@ -915,9 +908,9 @@ class Protein(Polymer):
         """
 
         # Show the graph
-        print 'Initial Graph'
+        print("Initial Graph")
         for row in graph:
-            print row
+            print(row)
 
         # Keep track of which residues have been attached to
         # a group
@@ -951,9 +944,9 @@ class Protein(Polymer):
             groups.append (group)
 
         # Print the resultant groups
-        print 'Final Groups'
+        print("Final Groups")
         for group in groups:
-            print group
+            print(group)
             
         return as_residues
 
@@ -999,9 +992,9 @@ class Protein(Polymer):
         """
 
         # Show the graph
-        print 'Initial Graph'
+        print("Initial Graph")
         for row in graph:
-            print row
+            print(row)
 
         # Keep track of which residues have been attached to
         # a group
@@ -1052,15 +1045,15 @@ class Protein(Polymer):
                         cnt+=1
                 if (cnt >= n):
                     group_tmp.append(inx)
-            print 'Before:',group
-            print 'After: ',group_tmp
+            print('Before:',group)
+            print('After: ',group_tmp)
             groups[i]=group_tmp
                     
 
         # Print the resultant groups
-        print 'Final Groups'
+        print("Final Groups")
         for group in groups:
-            print group
+            print(group)
 
         # Find the group with the largest number of residues = active site
         maxInx=-1
@@ -1073,7 +1066,7 @@ class Protein(Polymer):
 
         # Using that group get the actual residue numbers
         if (maxInx < 0):
-            print "ERROR: incorrect index (find_as)"
+            print("ERROR: incorrect index (find_as)")
 
         # Create the list of residues based on the group selected
         as_residues = []

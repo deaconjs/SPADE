@@ -1,4 +1,4 @@
-from Tkinter import *
+import tkinter
 import urllib
 import re
 import parms
@@ -15,7 +15,7 @@ from os import *
 pdb_dir = parms.get('pdb_dir')
 gifs_dir = path.abspath('./Tools/DatabaseManager') + path.normpath('/')
 
-class DirNode(Frame):
+class DirNode(tkinter.Frame):
     """    This class represents each Directory/File item in the treeWinText textbox.
            Creates a frame with:
             1.path to the item (path)
@@ -23,7 +23,7 @@ class DirNode(Frame):
             3.Pointer to the actual Node in SCOP Data structure
     """
     def __init__(self, pth, obj, parent=None):
-        Frame.__init__(self, parent, bg='white')
+        tkinter.Frame.__init__(self, parent, bg='white')
         self.pack()
         self.toplevel= parent
         self.thisNode = obj
@@ -137,14 +137,14 @@ class DirNode(Frame):
         self.isExpanded = 0
                 
                                 
-class UserDbViewer(Frame):
+class UserDbViewer(tkinter.Frame):
     """ Arguments:
                     parent  - the paned window object
                     pth     - the user-selected path
                     toplevel- the window in which Viewer is built
     """
     def __init__(self, parent, pth, toplevel):
-        Frame.__init__(self, parent.pane('top'), bg='white')
+        tkinter.Frame.__init__(self, parent.pane('top'), bg='white')
         self.parent = parent
         self.focus()		
         self.spade_level = toplevel #parent.pane('bottom')
@@ -217,10 +217,10 @@ class UserDbViewer(Frame):
                 selectedNode = nde.thisPath+nde.thisNode
                 iterNode = self.nodesList[pos].thisPath+self.nodesList[pos].thisNode
                 if iterNode.find(selectedNode) == 0 and selectedNode != iterNode:
-                    print pos
+                    print("pos")
                     self.nodesList.pop(pos)
-                    indx = "%0.1f"%(pos+1)
-                    indx1 = "%0.1f"%(pos+2)
+                    indx = f"{pos+1:0.1f}"
+                    indx1 = f"{pos+2:0.1f}"
                     self.treeWinText.delete(indx, indx1)
                     pos = pos - 1
                 pos = pos + 1
@@ -240,9 +240,9 @@ class UserDbViewer(Frame):
                             newDirNode = DirNode(selectedNode, child, self)
                             if path.isdir(os.path.join(selectedNode,child)) and (newDirNode.isCurrentNodeValid() == 1 or newDirNode.isCurrentNodeALeaf() == 1):
                                 self.nodesList.insert(pos+chld_pos, newDirNode)
-                                indx = "%0.1f"%(pos+chld_pos+1)
+                                indx = f"{pos+chld_pos+1:0.1f}"
                                 self.treeWinText.window_create(indx, window=self.nodesList[pos+chld_pos])
-                                indx = "%0.1f"%(pos+chld_pos+1+0.1)
+                                indx = f"{pos+chld_pos+1+0.1:0.1f}"
                                 self.treeWinText.insert(indx, '\n')
                                 chld_pos = chld_pos + 1
                             else:
@@ -265,7 +265,7 @@ class UserDbViewer(Frame):
                 buttons = ('OK', 'Cancel'),
                 defaultbutton = 'OK',
                 scrolledlist_labelpos = 'n',
-                label_text = 'This Domain folder has '+str(len(self.currentSelection.pdbFiles))+' PDB files, \nPlease Select One',
+                label_text = f"This Domain folder has {str(len(self.currentSelection.pdbFiles))} PDB files, \nPlease Select One",
                 scrolledlist_items = self.currentSelection.pdbFiles,
                 command = self.displayPDB)
             self.pdbSelectdialog.activate()
@@ -285,7 +285,7 @@ class UserDbViewer(Frame):
                     buttons = ('OK', ),
                     message_text = 'Please select one PDB or press \'CANCEL\'')
                 dialog.activate()			
-                print "Select a PDB file"
+                print("Select a PDB file")
                 return
             else:
                 selectedFile = self.pdbSelectdialog.getcurselection()[0]

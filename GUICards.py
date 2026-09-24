@@ -7,8 +7,7 @@ import copy
 import string
 import math
 # dependency imports
-from Tkinter import *
-import tkFileDialog
+import tkinter
 import Pmw
 # module imports
 sys.path.append('./Applications/AlignmentEditor')
@@ -18,7 +17,7 @@ sys.path.append('./Tools/Selection')
 import SystemSelectionDialog
 
 # holds a set of GUI Cards
-class CardFrame(Frame):
+class CardFrame(tkinter.Frame):
     def __init__(self, parent, my_system, master_window, standard_cards=1):
         """ initialize the information (card) holder of the system window """
         self.parent = parent
@@ -85,9 +84,9 @@ class CardFrame(Frame):
                 self.ligandCardList.pack(expand=YES, fill=X)
         self.CFSCardlist = []
 
-class Card(Frame):
+class Card(tkinter.Frame):
     def __init__(self, parent, select_command):
-        Frame.__init__(self, parent, borderwidth=0, height=1)
+        tkinter.Frame.__init__(self, parent, borderwidth=0, height=1)
         self.parent = parent
         if select_command != None:
             # make a button for selection
@@ -176,12 +175,12 @@ class SystemCard(Card):
         dialog.insert('end', hdr)
     
     def save_system(self):
-        system_save_name   = tkFileDialog.asksaveasfilename(title = 'Save System', defaultextension='.sps', filetypes=[("SPADE Pickled System", "*.sps"),("all files", "*")])
+        system_save_name   = tkinter.filedialog.asksaveasfilename(title = 'Save System', defaultextension='.sps', filetypes=[("SPADE Pickled System", "*.sps"),("all files", "*")])
         self.item.save_system(system_save_name)
 
-class backCard(Frame):
+class backCard(tkinter.Frame):
   def __init__(self, parent, frame_to_remove):
-    Frame.__init__(self, parent, borderwidth=0, height=1)
+    tkinter.Frame.__init__(self, parent, borderwidth=0, height=1)
     self.frame_to_remove = frame_to_remove
     self.parent = parent
     # make a button to recreate the system cards

@@ -3,7 +3,6 @@ import math
 import sys
 import string
 import time
-import cPickle
 
 from operator import xor
 
@@ -60,26 +59,24 @@ def multi_superimpose(systems):
 
     # create reference and source hash tables with all of the distances
     hash_tables = __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_replicate, replicate_thresh, core_only, sort_by_sequence)
-    print 'l_ref-%s, h_ref-%s, l_src-%s, h_src-%s'%(len(hash_tables[0].keys()), len(hash_tables[1].keys()), len(hash_tables[2].keys()), len(hash_tables[3].keys()))
+    print(f"l_ref-{len(hash_tables[0].keys())}, h_ref-{len(hash_tables[1].keys())}, l_src-{len(hash_tables[2].keys())}, h_src-{len(hash_tables[3].keys())}")
     
     # locate the bins with all structures, enumerate all possible combinations
-    print 'creating, filtering complete buckets'
+    print("creating, filtering complete buckets")
     complete_buckets = __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_distance, max_beta_distance, max_lowres_hash_size, max_alpha_rms, max_beta_rms, do_rms_filter)
-    
     record = cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist, min_hit_count, max_cluster_dist, prefilter_translation_thresh)
-
-    print '\n\n%s possible cores located\n\n'%(len(record))
+    print(f"\n\n{len(record)} possible cores located\n\n")
 
     for item in record:
-        print 'next item structure %s'%(item['structures'])
+        print(f"next item structure {item['structures']}")
         for index in range(len(item['structures'])):
             for anum in item['ref_buckets'][index]:
-                print ref_chain.atom_dict[anum].res_number,',',
-        print ""
+                print(f"{ref_chain.atom_dict[anum].res_number},", end=' ')
+        print("")
         for index in range(len(item['structures'])):
             for anum in item['src_buckets'][index]:
-                print src_chains[item['structures'][index]-1].atom_dict[anum].res_number,',',
-        print ""
+                print(f"{src_chains[item['structures'][index]-1].atom_dict[anum].res_number},", end=' ')
+        print("")
 
     complete_solutions = []
     bin_count = 0
@@ -95,7 +92,7 @@ def multi_superimpose(systems):
             atomlist.append(atom)
         complete_solutions.append({'structure':item['structures'][0], 'ref':item['ref_buckets'][0], 'src':item['src_buckets'][0]})
 
-    print '%s complete solutions located'%(len(complete_solutions))
+    print(f"{len(complete_solutions)} complete solutions located")
 
     system_list[0].save_pdb('./ref.pdb')
     solution_count = 0
@@ -119,14 +116,12 @@ def multi_superimpose(systems):
         ta,rm =_fit_pair([list1,list2])
         atoms = copy.deepcopy(protein_list[solution['structure']].atoms)
         _transform(ta,rm, protein_list[solution['structure']].atoms)
-        system_list[0].save_pdb('./sln%s_str0.pdb'%(solution_count))
-        system_list[solution['structure']].save_pdb('./sln%s_str%s.pdb'%(solution_count, solution['structure']))
+        system_list[0].save_pdb(f"./sln{solution_count}_str0.pdb")
+        system_list[solution['structure']].save_pdb(f"./sln{solution_count}_str{solution['structure']}.pdb")
         protein_list[solution['structure']].atoms = atoms
-
         solution_count += 1
         if solution_count == 10:
             break
-
 
 ### TRANSFORMATIONS ###
 
@@ -150,7 +145,7 @@ def _transform_coordinates(trns, rm, atom_list):
 def __atoms_to_pdb(atomlist, filename, chain_name="A"):
     file = open(filename, 'w')
     for atom in atomlist:
-        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(atom.atom_number,"CA","GLY",chain_name,atom.res_number,atom.x,atom.y,atom.z, " ")
+        
         file.write(line)
     file.close()
 
@@ -158,7 +153,7 @@ def __bucket_to_pdb(bucket, filename, chain_name="A"):
     file = open(filename, 'w')
     for atom_data in bucket:
         x,y,z = atom_data['coordinates'][0], atom_data['coordinates'][1], atom_data['coordinates'][2]
-        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(atom_data['atom_number'],"CA","GLY",chain_name,atom_data['atom_number'],x,y,z, " ")
+        line = f"ATOM {atom.atom_number:>6}{'CA':>5} {'GLY':>3} {chain_name:>1}{atom_data['atom_number']:>4} {atom.x:11.3f} {atom.y:7.3f} {atom.z:7.3f}"
         file.write(line)
     file.close()
         
@@ -167,7 +162,7 @@ def __coor_list_to_pdb(list, filename, chain_name="A"):
     cntr = 1
     for sublist in list:
         x,y,z = sublist[0], sublist[1], sublist[2]
-        line = 'ATOM %6d%5s %3s %1s%4d %11.3f %7.3f %7.3f%26s\n'%(cntr,"CA","GLY",chain_name,cntr,x,y,z, " ")
+        line = f"ATOM {cntr:>6}{'CA':>5} {'GLY':>3} {chain_name:>1}{cntr:>4} {x:11.3f} {y:7.3f} {z:7.3f}{' ':>26}"
         file.write(line)
         cntr += 1
     file.close()
@@ -272,10 +267,10 @@ def superimpose(systemlist):
     _center(systemlist[0].ProteinList[0].atoms)
     _center(systemlist[1].ProteinList[0].atoms)
     rm = _fit_pair_rotation(ps, 0)
-    print '%s atoms\n'%(systemlist[1].ProteinList[0].atoms)
+    print(f"{systemlist[1].ProteinList[0].atoms} atoms\n")
     _rotate(systemlist[1].ProteinList[0].atoms, rm)
     rms = _fit_atoms_rms(ps)
-    print 'rms = %s'%(rms)
+    print(f"rms = {rms}")
 
 def _fit_atoms_rms(atomlists):
     """ a list of k atoms from each of n structures """
@@ -311,13 +306,10 @@ def _fit_atoms_rms(atomlists):
                 distances.append(distance)
                 sum += distance
                 cnt += 1
-
     average_dist = sum/(cnt+0.0)
-
     sum = 0.0
     for distance in distances:
         sum += (distance-average_dist)**2
-
     return math.sqrt(sum/(cnt-1.0))
 
 
@@ -350,20 +342,17 @@ def _get_atoms_rms(atomlists):
                 distances.append(distance)
                 sum += distance
                 cnt += 1
-
     average_dist = sum/(cnt+0.0)
-
     sum = 0.0
     for distance in distances:
         sum += (distance-average_dist)**2
-
     return math.sqrt(sum/(cnt-1.0))
     
 def _fit_pair_rotation(fraglist, column=1, wt1=None, use_atoms=1):
     """ _fit_rotation finds the best fitting rotation
     """
     if len(fraglist[0]) != len(fraglist[1]):
-        print 'frags different lengths %s, %s'%(len(fraglist[0]), len(fraglist[1]))
+        print(f"frags different lengths {len(fraglist[0])}, {len(fraglist[1])}")
         return -1
     rm   = [[0.0,0.0,0.0],
             [0.0,0.0,0.0],
@@ -492,7 +481,7 @@ def _fit_pair_rotation(fraglist, column=1, wt1=None, use_atoms=1):
             break
         # store intermediate copies of rotation matrix
         if rotcnt >= 100:
-            print 'out of bounds'
+            print("out of bounds")
             sys.exit()
         gRotMat[rotcnt] = copy.deepcopy(rot)
         rotcnt += 1
@@ -511,7 +500,7 @@ def _fit_pair_rotation(fraglist, column=1, wt1=None, use_atoms=1):
 
 
 def __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_replicate, replicate_thresh, core_only, sort_by_sequence):
-    print 'collecting hash keys'
+    print("collecting hash keys")
     l_src_hash = {}
     h_src_hash = {}
     l_ref_hash = {}
@@ -544,10 +533,10 @@ def __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
         if core_only == 2:
             atom_list = src.get_core_alpha_carbons(core_cutoff, neighbor_thresh)
             sec_list  = src.get_central_atom_list()
-            print '%s of %s are core atoms'%(len(atom_list), len(sec_list))
+            print(f"{len(atom_list)} of {len(sec_list)} are core atoms")
             for al in atom_list:
-                print '%s,'%(al.res_number),
-            print ""
+                print(f"{al.res_number},", end=' ')
+            print("")
         elif core_only == 1:
             atom_list = src.get_central_atom_list()
         # calculate hash keys and store
@@ -627,13 +616,8 @@ def __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
                                                   math.sqrt(((xb[0]-xb[1])**2) + ((yb[0]-yb[1])**2) + ((zb[0]-zb[1])**2)),
                                                   math.sqrt(((xb[0]-xb[2])**2) + ((yb[0]-yb[2])**2) + ((zb[0]-zb[2])**2)),
                                                   math.sqrt(((xb[1]-xb[2])**2) + ((yb[1]-yb[2])**2) + ((zb[1]-zb[2])**2))]
-
-                            hires_dl_string  = '%2.1f_%2.1f_%2.1f_%2.1f_%2.1f_%2.1f_'%(new_distance_list[0],
-                                                                                       new_distance_list[1],
-                                                                                       new_distance_list[2],
-                                                                                       new_distance_list[3],
-                                                                                       new_distance_list[4],
-                                                                                       new_distance_list[5])
+                                                  
+                            hires_dl_string = f"{new_distance_list[0]:2.1f}_{new_distance_list[1]:2.1f}_{new_distance_list[2]:2.1f}_{new_distance_list[3]:2.1f}_{new_distance_list[4]:2.1f}_{new_distance_list[5]:2.1f}_"
 
                             # store the bin distances to replicate
                             lowres_dl_bins   = [[],[],[],[],[],[]]
@@ -653,14 +637,9 @@ def __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
                                             for i3 in lowres_dl_bins[3]:
                                                 for i4 in lowres_dl_bins[4]:
                                                     for i5 in lowres_dl_bins[5]:
-                                                        lowres_dlstrings.append('%2.0f_%2.0f_%2.0f_%2.0f_%2.0f_%2.0f_'%(i0,i1,i2,i3,i4,i5))
+                                                        lowres_dlstrings.append(f"{i0:2.0f}_{i1:2.0f}_{i2:2.0f}_{i3:2.0f}_{i4:2.0f}_{i5:2.0f}_")
                             else:
-                                lowres_dlstrings.append('%2.0f_%2.0f_%2.0f_%2.0f_%2.0f_%2.0f_'%(lowres_dl_bins[0][0],
-                                                                                                lowres_dl_bins[1][0],
-                                                                                                lowres_dl_bins[2][0],
-                                                                                                lowres_dl_bins[3][0],
-                                                                                                lowres_dl_bins[4][0],
-                                                                                                lowres_dl_bins[5][0]))
+                                lowres_dlstrings.append(f"{lowres_dl_bins[0][0]:2.0f}_{lowres_dl_bins[1][0]:2.0f}_{lowres_dl_bins[2][0]:2.0f}_{lowres_dl_bins[3][0]:2.0f}_{lowres_dl_bins[4][0]:2.0f}_{lowres_dl_bins[5][0]:2.0f}_")
                             normal_vector = [ys[0]*zs[1] - zs[0]*ys[1],
                                              zs[0]*xs[1] - xs[0]*zs[1],
                                              xs[0]*ys[1] - ys[0]*xs[1]]
@@ -693,22 +672,20 @@ def __create_4_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
 
         end_time = time.clock()
         # record how many items have been added to the coloring lists of 
-        print 'structure done in %5.3f seconds'%(end_time - start_time)
+        print(f"structure done in {end_time - start_time:5.3f} seconds")
     sum = 0
     cnt = 0
     for l_key in l_hash.keys():
         sum += len(l_hash[l_key])
         cnt += 1
-    print 'average lowres storage size = %s'%(sum/(cnt+0.0))
+    print(f"average lowres storage size = {sum/(cnt+0.0)}")
 
-    print 'done key generation. %s lowres, %s hires items stored'%(lores_counter, hires_counter)
+    print(f"done key generation. {lores_counter} lowres, {hires_counter}")
     return [l_ref_hash, h_ref_hash, l_src_hash, h_src_hash]
 
 
-
-
 def __create_3_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_replicate, replicate_thresh, core_only, sort_by_sequence):
-    print 'collecting hash keys'
+    print("collecting hash keys")
     l_src_hash = {}
     h_src_hash = {}
     l_ref_hash = {}
@@ -741,16 +718,15 @@ def __create_3_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
         if core_only == 2:
             atom_list = src.get_core_alpha_carbons(core_cutoff, neighbor_thresh)
             sec_list  = src.get_central_atom_list()
-            print '%s of %s are core atoms'%(len(atom_list), len(sec_list))
+            print(f"{len(atom_list)} of {len(sec_list)} are core atoms")
             for al in atom_list:
-                print '%s,'%(al.res_number),
-            print ""
+                print("{al.res_number}", end=' ')
+            print("")
         elif core_only == 1:
             atom_list = src.get_central_atom_list()
         # calculate hash keys and store
         # note that the coordinates are all normalized such that the query atom is on the origin
         for central_atom in atom_list:
-            #print 'next Ca'
             x1,y1,z1 = central_atom.x, central_atom.y, central_atom.z
             pb1      = central_atom.parent.pseudo_sidechain
             ncps = central_atom.data['nearby_cps']
@@ -810,10 +786,7 @@ def __create_3_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
                         beta_distances     = [beta_dist[f[0]],
                                               beta_dist[f[1]],
                                               math.sqrt(((xb[0]-xb[1])**2) + ((yb[0]-yb[1])**2) + ((zb[0]-zb[1])**2))]
-
-                        hires_dl_string  = '%2.1f_%2.1f_%2.1f_'%(new_distance_list[0],
-                                                                 new_distance_list[1],
-                                                                 new_distance_list[2])
+                        hires_dl_string = f"{new_distance_list[0]:2.1f}_{new_distance_list[1]:2.1f}_{new_distance_list[2]:2.1f}_"
 
                         # store the bin distances to replicate
                         lowres_dl_bins   = [[],[],[]]
@@ -830,11 +803,9 @@ def __create_3_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
                             for i0 in lowres_dl_bins[0]:
                                 for i1 in lowres_dl_bins[1]:
                                     for i2 in lowres_dl_bins[2]:
-                                        lowres_dlstrings.append('%2.0f_%2.0f_%2.0f_'%(i0,i1,i2))
+                                        lowres_dlstrings.append(f"{i0:2.0f}_{i1:2.0f}_{i2:2.0f}_")
                         else:
-                            lowres_dlstrings.append('%2.0f_%2.0f_%2.0f_'%(lowres_dl_bins[0][0],
-                                                                          lowres_dl_bins[1][0],
-                                                                          lowres_dl_bins[2][0]))
+                            lowres_dlstrings.append(f"{lowres_dl_bins[0][0]:2.0f}_{lowres_dl_bins[1][0]:2.0f}_{lowres_dl_bins[2][0]:2.0f}_")
 
                         lores_counter += len(lowres_dlstrings)
                         hires_counter += 1
@@ -852,18 +823,16 @@ def __create_3_musta_hashes(protein_list, core_cutoff, neighbor_thresh, dsf, do_
 
 
         end_time = time.clock()
-        print 'structure done in %5.3f seconds'%(end_time - start_time)
+        print(f"structure done in {end_time - start_time:5.3f} seconds")
     sum = 0
     cnt = 0
     for l_key in l_hash.keys():
         sum += len(l_hash[l_key])
         cnt += 1
-    print 'average lowres storage size = %s'%(sum/(cnt+0.0))
+    print("average lowres storage size = {sum/(cnt+0.0)}")
 
-    print 'done key generation. %s lowres, %s hires items stored'%(lores_counter, hires_counter)
+    print(f"done key generation. {lores_counter} lowres, {hires_counter} hires items stored")
     return [l_ref_hash, h_ref_hash, l_src_hash, h_src_hash]
-
-
 
 
 def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_distance, max_beta_distance, max_lowres_hash_size, max_alpha_rms=0.5, max_beta_rms=0.5, do_rms_filter=1):
@@ -894,7 +863,7 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
             miss += 1
         else:
             hit += 1
-    print 'of the remaining %s ref keys, %s match the %s src keys'%(hit + miss, hit, len(l_musta_hash.keys()))
+    print(f"of the remaining {hit + miss} ref keys, {hit} match the {len(l_musta_hash.keys())} src keys")
 
     # filter out source keys with too few hashed items
     hit = 0
@@ -910,7 +879,7 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
             del l_ref_hash[key]
         else:
             miss += 1
-    print 'of the remaining %s ref keys, %s match src keys with all structures present'%(hit + miss, miss)
+    print(f"of the remaining {hit + miss} ref keys, {miss} match src keys with all structures present")
 
     # filter out source keys with too many hash entries
     hit = 0
@@ -921,7 +890,7 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
             del l_ref_hash[key]
         else:
             miss += 1
-    print 'of the remaining %s ref keys, %s match src keys without > %s hash entries'%(hit + miss, miss, max_lowres_hash_size)
+    print(f"of the remaining {hit + miss} ref keys, {miss} match src keys without > {max_lowres_hash_size} hash entries")
 
     complete_buckets = []
     for j in range(len(src_chains)):
@@ -949,7 +918,7 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
                     if diff_distance < max_alpha_distance:
                         for set in h_musta_hash[h_mst_key]:                     # for each set under this hi-res key
                             iteration_counter += 1
-    print '%s reference to source comparisons to consider'%(iteration_counter)
+    print(f"{iteration_counter} reference to source comparisons to consider")
     start_time = time.clock()
 
     cntr = 0
@@ -966,17 +935,15 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
                     for i in range(len(h_mst_tokens)):                          # count the distance; these are single-decimal precision distances
                         diff_distance += (string.atof(h_mst_tokens[i]) - string.atof(h_ref_tokens[i]))**2
                     diff_distance = math.sqrt(diff_distance)
-                    #print 'a dis %4.2f'%(diff_distance)
                     if diff_distance < max_alpha_distance:
                         for set in h_musta_hash[h_mst_key]:                     # if the alphas are compatible, check the betas
                             cntr += 1
                             if cntr % 10000 == 0:
-                                print '10k'
+                                print("10k")
                             diff_distance = 0.0
                             for i in range(len(ref_hit['beta_distances'])):     # count the distance
                                 diff_distance += (ref_hit['beta_distances'][i]-set['beta_distances'][i])**2
                             diff_distance = math.sqrt(diff_distance)
-                            #print '         b      dis %4.2f'%(diff_distance)
                             if diff_distance <= max_beta_distance:
                                 decent_hashes.append(set)                       # if the betas are good too, then store the set
                 if len(decent_hashes) < len(src_chains):                            # pass if not enough structures
@@ -1016,10 +983,8 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
                                     atomlist2[-1].append(src_chains[j].atom_dict[atomnum].parent.pseudo_sidechain)
                             if do_rms_filter:
                                 rms = _fit_atoms_rms(atomlist1)
-                                #print 'a rms %4.2f'%(rms)
                                 if rms <= max_alpha_rms:
                                     rms = _fit_atoms_rms(atomlist2)
-                                    #print '    b rms %4.2f'%(rms)
                                     if rms <= max_beta_rms:
                                         complete_buckets.append({'data':[copy.deepcopy(ref_hit)], 'key':l_ref_key})
                                         for j in range(len(src_chains)):
@@ -1031,10 +996,8 @@ def __create_complete_buckets(ref_chain, src_chains, hash_tables, max_alpha_dist
 
     end_time = time.clock()
     # record how many items have been added to the coloring lists of 
-    print 'done complete bins %5.3f seconds'%(end_time - start_time)
-    #print 'alpha - kept %s threw %s %s'%(alpha_keep, alpha_throw, alpha_keep/(alpha_throw+0.0))
-    #print 'beta  - kept %s threw %s %s'%(beta_keep, beta_throw, beta_keep/(beta_throw+0.0))
-    print '%s ref hits to %s complete bins (%s under %s %s RMS)'%(full_hits, bin_count, len(complete_buckets), max_alpha_rms, max_beta_rms)
+    print(f"done complete bins {end_time - start_time:5.3f} seconds")
+    print(f"{full_hits} ref hits to {bin_count} complete bins ({len(complete_buckets)} under {max_alpha_rms} {max_beta_rms} RMS)")
     return complete_buckets
 
 
@@ -1047,12 +1010,12 @@ def cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist
     for bucket in complete_buckets:
         bucket['available'] = 1
 
-    print '%s buckets'%(len(complete_buckets))
+    print(f"{len(complete_buckets)} buckets")
 
     bucket_backup = copy.deepcopy(complete_buckets)
 
     for i in range(1,len(src_chains)+1):
-        print 'structure %s %s'%(i,src_chains[i-1].parent.filename)
+        print(f"structure {i} {src_chains[i-1].parent.filename}")
         complete_buckets = copy.deepcopy(bucket_backup)
         # collect the total match list for this src-ref combo. these are simply all nonredundant pairs of atoms that appear
         total_match_list = []
@@ -1072,22 +1035,19 @@ def cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist
                     complete_buckets[j]['match_indices'].append(total_match_index)
                     total_match_list.append({'src':src_chains[i-1].atom_dict[complete_buckets[j]['data'][i]['atoms'][k]],'ref':ref_chain.atom_dict[complete_buckets[j]['data'][0]['atoms'][k]]})
                     total_match_index += 1
-        print '%s in total_match_list'%(len(total_match_list))
+        print(f"{len(total_match_list)} in total_match_list")
 
         added_a_new_one  = 1
         while added_a_new_one == 1:                                               # iterate until no more clustering is available
-            print 'iterating'
+            print("iterating")
             start_time = time.clock()
-
             for bucket in complete_buckets:                                       # reset cluster centers to available for clustering and pickup
                 if bucket['available'] == 2:
                     bucket['available'] = 1
             added_a_new_one = 0
-
             for bucket in complete_buckets:
                 if len(bucket['match_indices']) < 3:
                     bucket['available'] = 0
-
             # take the consensus of the used indices from the total_match_list
             consensus_transform_indices = []
             for bucket in complete_buckets:
@@ -1095,7 +1055,7 @@ def cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist
                     for match_index in bucket['match_indices']:
                         if match_index not in consensus_transform_indices:
                             consensus_transform_indices.append(match_index)
-            print '%s transform indices left - calculating masks'%(len(consensus_transform_indices))
+            print(f"{len(consensus_transform_indices)} transform indices left - calculating masks")
 
             # first update the match_indices; the transformation mask
             added_matches = 0
@@ -1129,13 +1089,12 @@ def cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist
             for bucket in complete_buckets:
                 if bucket['available'] == 1:
                     left_avail_count += 1
-            print 'done transformation masks - merged %s of %s clusters - begin clustering'%(added_matches, added_matches+failed_matches)
+            print(f"done transformation masks - merged {added_matches} of {added_matches+failed_matches} clusters - begin clustering")
             
             still_available = 0                                                   # count how many are left
             for bucket in complete_buckets:
                 if bucket['available'] == 1:
                     still_available += 1
-
             match_count      = 0
             last_match_count = 1
             while still_available > 0:                                            # cluster all of the groups by iteratively passing through
@@ -1246,13 +1205,13 @@ def cluster_by_singles(ref_chain, src_chains, complete_buckets, min_cluster_dist
                 if len(bucket['data'][0]['atoms']) > match_count:
                     match_count = len(bucket['data'][0]['atoms'])
             end_time = time.clock()
-            print 'iteration done in %5.3f seconds'%(end_time - start_time)
-            print 'largest match %s residues'%(match_count)
+            print(f"iteration done in {end_time - start_time:5.3f} seconds")
+            print(f"largest match {match_count} residues")
 
         for bucket in complete_buckets:
             if len(bucket['data'][0]['atoms']) >= min_hit_count:
                 record.append({'structures':[i],'ref_buckets':[copy.deepcopy(bucket['data'][0]['atoms'])],'src_buckets':[copy.deepcopy(bucket['data'][i]['atoms'])]})
-    print '%s records found'%(len(record))
+    print(f"{len(record)} records found")
     return record
 
 
@@ -1276,7 +1235,6 @@ if __name__ == '__main__':
         systems[1].save_pdb('atoms4.pdb')
 
     end_time = time.clock()
-    print 'program done in %5.3f seconds'%(end_time - start_time)
-
+    print(f"program done in {end_time - start_time:5.3f} seconds")
 
 
