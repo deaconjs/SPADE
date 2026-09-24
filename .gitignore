@@ -15,3 +15,6 @@ clustalw.exe
 # Applications are kept local, not published
 Applications/
 AlignmentEditor.tar
+
+# Program output
+interface_results.txt
