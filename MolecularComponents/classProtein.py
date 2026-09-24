@@ -1,6 +1,5 @@
 import sys
 import os
-import string
 import parms
 from copy import deepcopy
 import numpy
@@ -38,7 +37,7 @@ class Protein(Polymer):
             if current_line == last_line:
                 # handle duplicate atom records
                 atomname = line[12:16]
-                splitname = string.split(string.strip(atomname))
+                splitname = atomname.strip().split()
                 if len(splitname) == 2:          # have a 'CA A' or some such thing
                     if splitname[1] != 'A':      # dismiss B or C duplicates
                         last_line = current_line
@@ -46,7 +45,7 @@ class Protein(Polymer):
                         continue
                     else:
                         line = line[:15] + ' ' + line[16:]    # just get rid of the 'A'
-                        self.atoms[atom_cnt].atom_type = string.split(self.atoms[atom_cnt].atom_type)[0]
+                        self.atoms[atom_cnt].atom_type = self.atoms[atom_cnt].atom_type.split()[0]
                 else:
                     # if the line has a number, followed by a letter, it must be duplicate
                     if line[14] in ['1','2','3','4'] and line[15] in ['A','B','C','D']:
@@ -166,7 +165,7 @@ class Protein(Polymer):
     # before using this, use fill_proteolysis_fragments
     # outdated by get_nearest_proteolysis_fragment in MS
     def get_nearest_proteolysis_fragment(self, query_weight):
-        qw = string.atof(query_weight)
+        qw = float(query_weight)
         closest_index = 0
         closest_dist  = 1000000
         weight_index = 0
@@ -324,7 +323,7 @@ class Protein(Polymer):
                 buffer = contact_file.readline()
                 if len(buffer) == 0:
                     break
-                tokens = string.split(buffer, ',')
+                tokens = buffer.split(',')
                 token_index = 0
                 for rex2 in range(rex, len(self.residues)):
                     contact_list[rex][rex2] = 100 * (float(tokens[token_index]))
@@ -411,7 +410,7 @@ class Protein(Polymer):
             default_area = (4.0/3.0) * 3.141592654 * ((solvent_radius + 1.8)**3)
 
             sphere_res = 15
-            if self.x_table == None:
+            if self.x_table is None:
                 self.build_futamura_intersection_table(solvent_radius)
             x_table = self.x_table
             # create spheres for each atom
@@ -490,11 +489,11 @@ class Protein(Polymer):
                 buffer = asa_file.readline()
                 if len(buffer) == 0:
                     break
-                tokens = string.split(buffer)
-                self.residue_dict[string.atoi(tokens[0])].features['asa'] = string.atof(tokens[1])
-                self.residue_dict[string.atoi(tokens[0])].features['sidechain_asa'] = string.atof(tokens[2])
-                self.residue_dict[string.atoi(tokens[0])].data['exposed_area'] = string.atof(tokens[3])
-                self.residue_dict[string.atoi(tokens[0])].data['exposed_sidechain_area'] = string.atof(tokens[4])
+                tokens = buffer.split()
+                self.residue_dict[int(tokens[0])].features['asa'] = float(tokens[1])
+                self.residue_dict[int(tokens[0])].features['sidechain_asa'] = float(tokens[2])
+                self.residue_dict[int(tokens[0])].data['exposed_area'] = float(tokens[3])
+                self.residue_dict[int(tokens[0])].data['exposed_sidechain_area'] = float(tokens[4])
             asa_file.close()
 
     def get_core_alpha_carbons(self, core_cutoff=8, neighbor_thresh=3):
@@ -583,7 +582,7 @@ class Protein(Polymer):
         for line in self.parent.HeaderLines:
             if line[:5] == 'HELIX':
                 found_secondary = 1
-                if string.strip(line[19:20]) == string.strip(self.chain_name):
+                if line[19:20].strip() == self.chain_name.strip():
                     start_res = int(line[21:25])
                     end_res = int(line[33:37])
                     for i in range(start_res, end_res):
@@ -595,7 +594,7 @@ class Protein(Polymer):
                             self.residue_dict[i].features['secondary'] = 'A'
             if line[:5] == 'SHEET':
                 found_secondary = 1
-                if string.strip(line[21:22]) == string.strip(self.chain_name):
+                if line[21:22].strip() == self.chain_name.strip():
                     start_res = int(line[22:26])
                     end_res = int(line[33:37])
                     for i in range(start_res, end_res):

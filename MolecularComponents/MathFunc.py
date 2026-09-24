@@ -1,5 +1,5 @@
 from math import *
-from scipy import *
+from numpy import r_, dot
 
 """
    Returns the angle made by the triangle P-Q-R in degrees

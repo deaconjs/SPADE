@@ -1,6 +1,5 @@
 import os
 import pickle
-import string
 
 peakrec_fraction = 2
 parms_dat = os.path.join(".", 'parms.dat')
@@ -17,7 +16,7 @@ def set(query_parm, value):
     parms_file = open(parms_dat, 'r')
     lines = parms_file.readlines()
     for lind in range(len(lines)):
-        line = string.strip(lines[lind])
+        line = lines[lind].strip()
         if query_parm in line:         # if already present, modify, else, append at the end
             lines[lind:lind+1] = '    \'%s\':%s,\n'%(query_parm, repr(value))
             break
@@ -30,6 +29,7 @@ def set(query_parm, value):
     parms_file.close()
 
 def what():
-    execfile(parms_dat, globals())
+    with open(parms_dat, 'r') as f:
+        exec(f.read(), globals())
     print(parms_list.keys())
     

@@ -4,7 +4,6 @@ import re
 sys.path.append(os.getcwd())
 
 from MolecularComponents.classPoint import Point
-import string
 
 class Atom(Point):
     def __init__(self, parent, PDBline):
@@ -16,11 +15,11 @@ class Atom(Point):
         # this could probably be rewritten for robustness to learn the
         # useage of column patterns in any particular pdb file
         PDBline = self.pdb_line
-        record           = string.strip(PDBline[0:6])   # record name
+        record           = PDBline[0:6].strip()   # record name
         self.atom_number = int(PDBline[6:11])   # atom number
-        self.atom_type   = string.strip(PDBline[13:16]) # atom type
+        self.atom_type   = PDBline[13:16].strip() # atom type
         # if extra_type is present, test to see if its a number or a letter
-        self.extra_type1 = string.strip(PDBline[11:12])
+        self.extra_type1 = PDBline[11:12].strip()
         if self.extra_type1 != "":
             if re.compile('[0-9]').search(self.extra_type1):
                 # if its a number, append it to atom_type -- present in Amber protonated files
@@ -28,7 +27,7 @@ class Atom(Point):
             elif re.compile('[A-Z]').search(self.extra_type1):
                 # if a capital letter, its probably the first letter of the type. Just add it there.
                 self.atom_type = self.extra_type1 + self.atom_type
-        self.extra_type2 = string.strip(PDBline[12:13]) # sometimes a number appears here
+        self.extra_type2 = PDBline[12:13].strip() # sometimes a number appears here
         if self.extra_type2 != "":
             if re.compile('[0-9]').search(self.extra_type2):
                 self.atom_type = self.atom_type + self.extra_type2
@@ -37,18 +36,18 @@ class Atom(Point):
         #if PDBline[15:16] == " ":
         #    self.branch_des = 0
         #else:
-        #    self.branch_des  = string.atoi(PDBline[15:16])  # branch designator
-        #self.alt_ind     = string.strip(PDBline[16:17]) # alternate location indicator
-        self.res_type    = string.strip(PDBline[17:20]) # residue type
-        self.chain_name  = string.strip(PDBline[21:22]) # chain name
+        #    self.branch_des  = int(PDBline[15:16])  # branch designator
+        #self.alt_ind     = PDBline[16:17].strip() # alternate location indicator
+        self.res_type    = PDBline[17:20].strip() # residue type
+        self.chain_name  = PDBline[21:22].strip() # chain name
         self.res_number  = int(PDBline[22:26])  # residue number
         self.x           = float(PDBline[30:38])  # x-coor
-        y = string.split(PDBline[38:46])
+        y = PDBline[38:46].split()
         if len(y) == 2:
             self.y           = float(y[1])  # y-coor
         else:
             self.y           = float(y[0])
-        z = string.split(PDBline[46:54])
+        z = PDBline[46:54].split()
         if len(z) == 2:
             self.z           = float(z[1])
         else:
@@ -56,27 +55,27 @@ class Atom(Point):
         # set occupancy value, if available
         self.occupancy = None
         if len(PDBline) >= 60:
-            token = string.strip(PDBline[54:60])
+            token = PDBline[54:60].strip()
             if len(token) > 0:
                 self.occupancy   = float(token)  # occupancy
         # set the b_factor, if available
         self.b_factor = None
         if len(PDBline) >= 66:
-            token = string.strip(PDBline[60:66])
+            token = PDBline[60:66].strip()
             if len(token) > 0:
                 self.b_factor = float(token)
         # set the segment term, if available
         self.segment = None
         if len(PDBline) >= 76:
-            token = string.strip(PDBline[73:76])
+            token = PDBline[73:76].strip()
             if len(token) > 0:
-                self.segment     = string.strip(token) # segment identifier
+                self.segment     = token.strip() # segment identifier
         # set the charge term, if available
         #self.pdb_charge = None
         #if len(PDBline) >= 80:
-        #    token = string.strip(PDBline[79:80])
+        #    token = PDBline[79:80].strip()
         #    if len(token) > 0:
-        #        self.pdb_charge  = string.atof(token)  # charge from the pdb file
+        #        self.pdb_charge  = float(token)  # charge from the pdb file
 
         if initial_build:
             self.selected = 1

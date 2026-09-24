@@ -1,20 +1,19 @@
-import string
 import os
 def translate_filename_to_DOS_8_3_format(filename):
     """ Assumes working on Windows. clustalw doesn't seem to like opening files in normal
     format when a directory in the path has a space in it. Change the format to 8.3 format,
     where each filename has at most 8 chars in the filename (using ~1 format)."""
     filename = os.path.abspath(filename)
-    components = string.split(filename, '\\')
+    components = filename.split('\\')
     out = ""
     for i in range(len(components)):
-        stuff = string.split(components[i], ' ')
-        components[i] = string.join(stuff, '')
+        stuff = components[i].split(' ')
+        components[i] = ''.join(stuff)
     for i in range(len(components)-1):
         if len(components[i]) > 8:
             components[i] = components[i][:6] + '~1'
         out = out + components[i] + '\\'
-    x = string.rfind(components[-1],'.')
+    x = components[-1].rfind('.')
     if x == -1 or x<8:
         new_string = components[-1]
     else:       # if there's a dot and the base is > 8 characters

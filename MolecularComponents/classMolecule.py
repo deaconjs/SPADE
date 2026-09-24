@@ -4,7 +4,6 @@ sys.path.append(os.getcwd())
 from MolecularComponents.classAtom import Atom
 from MolecularComponents.classPoint import Point
 from MolecularComponents.classFutamuraHash import FutamuraHash
-import string
 import math
 import parms
 verbose = 0
@@ -27,8 +26,8 @@ class Molecule:
         self.centroid = Point(centroid[0]/len(self.atoms),centroid[1]/len(self.atoms),centroid[2]/len(self.atoms))
 
         line = PDBlines[0]
-        self.chain_name = string.strip(line[21:22])
-        self.res_type   = string.strip(line[17:20])
+        self.chain_name = line[21:22].strip()
+        self.res_type   = line[17:20].strip()
         self.selected   = 1             # start everything out as selected
         self.visible    = 1             # and visible
         self.atom_points = 'None'   # holds vtkPoint
@@ -270,16 +269,16 @@ class Molecule:
     # res_type res_number chain_name float float float ...
     def update_cfs(self, coor_string, distances_moved):
         # check to see that the type and number are the same
-        coor_list = string.split(coor_string.strip())
+        coor_list = coor_string.strip().split()
         if coor_list[0] != self.res_type or int(coor_list[1]) != self.res_number:
-            if len(string.strip(self.chain_name)) > 0:
+            if len(self.chain_name.strip()) > 0:
                 if coor_list[2] != self.chain_name:
                     print(f"problem loading: {coor_list[0]}{int(coor_list[1])} and {self.res_type}{self.res_number} different")
                     return -1
             else:
                 print(f"problem loading: {coor_list[0]}{int(coor_list[1])} and {self.res_type}{self.res_number} different")
                 return -1
-        if len(string.strip(self.chain_name)) == 0:
+        if len(self.chain_name.strip()) == 0:
             offset = 2
         else:
             offset = 3
@@ -317,8 +316,8 @@ class Molecule:
             x_table['%s'%(atom.atom_number)] = []
             r1 = radii.get(atom.atom_type[0], default_distance)
             block = block_assignments['%s'%(atom.atom_number)]
-            key_tokens = string.split(block)
-            keys = [string.atoi(key_tokens[0]), string.atoi(key_tokens[1]), string.atoi(key_tokens[2])]
+            key_tokens = block.split()
+            keys = [int(key_tokens[0]), int(key_tokens[1]), int(key_tokens[2])]
             # put 'this' block first, so that intersection table accesses search here first
             for second_atom in T[block]:
                 if atom != second_atom:
@@ -396,7 +395,7 @@ class Molecule:
                 buffer = densities_file.readline()
                 if len(buffer) == 0:
                     break
-                atom.features['atomic_density'] = string.atof(buffer)
+                atom.features['atomic_density'] = float(buffer)
             densities_file.close()
 
 

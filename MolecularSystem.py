@@ -7,7 +7,6 @@ import pickle
 import copy
 import math
 import random
-import string
 
 # internal imports
 from MolecularComponents.classAtom            import Atom
@@ -33,7 +32,7 @@ class System:
         self.__module__ = "System"
         self.filename = file_name
         if file_name:
-            tokens = string.split(file_name, '.')
+            tokens = file_name.split('.')
             self.load(file_name, tokens[-1])
 
     def select(self):
@@ -47,7 +46,7 @@ class System:
         self.x_table = None
         self.selected = 1
         self.visible  = 1
-        type = string.upper(type_arg)
+        type = type_arg.upper()
         if type == 'SPS':
             self.load_system(filename)
         elif type in ['PDB', 'ENT']:
@@ -103,7 +102,7 @@ class System:
                 self.HeaderLines.append(line)
         for line in self.HeaderLines:
             if line[0:4] == 'HEAD':
-                self.header = string.strip(line[6:])
+                self.header = line[6:].strip()
                 
         if verbose:
             print(f"{len(ATOMlines)} atoms")
@@ -189,7 +188,7 @@ class System:
             last_rez_num = None
             current_molecule = []
             for line in OTHlines:
-                current_rez_num = string.atoi(line[23:26])
+                current_rez_num = int(line[23:26])
                 if current_rez_num == last_rez_num:
                     current_molecule.append(line)
                 else:
@@ -374,7 +373,7 @@ class System:
         res_type    = target_res.res_type
         x,y,z = coordinates_list[0], coordinates_list[1], coordinates_list[2]
         new_atom = Atom(target_chain.residues_dict[f"{res_number}"],\
-                        f"ATOM {atom_number:>6}{atom_type:>5} {res_type:>3} {chain_name:>1}{res_number:>4} {x:11.3f} {y:7.3f} {z:7.3f}{space:>26}\n")
+                        f"ATOM {atom_number:>6}{atom_type:>5} {res_type:>3} {chain_name:>1}{res_number:>4} {x:11.3f} {y:7.3f} {z:7.3f}{' ':>26}\n")
         new_atom.data['parent_molecule'] = target_res
         # can just insert into the residue's dictionary
         target_res.atoms_dict[new_atom.atom_type] = new_atom
@@ -463,7 +462,7 @@ class System:
                         donor['donorAtom'].Donor_HBonds.append(hbond)
                         self.HBonds.append (hbond)
 
-        print(f"located {self.HBonds} hbonds")
+        print(f"located {len(self.HBonds)} hbonds")
 
     def calculate_block_function_strength(self, HBondInfo):
         # calculate strengths
@@ -519,7 +518,7 @@ class System:
         Hv=MolecularComponents.MathFunc.r_[hydAtom.x,hydAtom.y,hydAtom.z]
         Av=MolecularComponents.MathFunc.r_[accAtom.x,accAtom.y,accAtom.z]
         # There is no AAAtom for water molecules
-        if (AAAtom == None and accAtom.res_type in ("HOH")):
+        if (AAAtom is None and accAtom.res_type in ("HOH")):
             AAv=None
         else:
             AAv=MolecularComponents.MathFunc.r_[AAAtom.x,AAAtom.y,AAAtom.z]
@@ -527,7 +526,7 @@ class System:
         HBondInfo['dist_D_A']= MolecularComponents.MathFunc.distance (Dv,Av)
         HBondInfo['dist_H_A'] = MolecularComponents.MathFunc.distance (Hv,Av)
         HBondInfo['angle_D_H_A'] = MolecularComponents.MathFunc.angle (Dv,Hv,Av)
-        if (AAv != None):
+        if (AAv is not None):
             # print Dv[0],Dv[1],Dv[2],Av[0],Av[1],Av[2]
             HBondInfo['angle_D_A_AA'] = MolecularComponents.MathFunc.angle (Dv,Av,AAv)
             HBondInfo['angle_H_A_AA'] = MolecularComponents.MathFunc.angle (Hv,Av,AAv)
@@ -858,9 +857,9 @@ class System:
                     buffer = asa_file.readline()
                     if len(buffer) == 0:
                         break
-                    tokens = string.split(buffer)
-                    pchain.residue_dict[string.atoi(tokens[0])].features['system_asa'] = string.atof(tokens[1])
-                    pchain.residue_dict[string.atoi(tokens[0])].features['system_sidechain_asa'] = string.atof(tokens[2])
+                    tokens = buffer.split()
+                    pchain.residue_dict[int(tokens[0])].features['system_asa'] = float(tokens[1])
+                    pchain.residue_dict[int(tokens[0])].features['system_sidechain_asa'] = float(tokens[2])
             asa_file.close()
 
     def calculate_differential_system_asa(self, solvent_radius, point_count, forced_rewrite=0):
@@ -1070,8 +1069,8 @@ class System:
             x_table[f"{atom.atom_number}"] = []
             r1 = solvent_radius + atom.radius
             block = block_assignments[f"{atom.atom_number}"]
-            key_tokens = string.split(block)
-            keys = [string.atoi(key_tokens[0]), string.atoi(key_tokens[1]), string.atoi(key_tokens[2])]
+            key_tokens = block.split()
+            keys = [int(key_tokens[0]), int(key_tokens[1]), int(key_tokens[2])]
             # put 'this' block first, so that intersection table accesses search here first
             for second_atom in T[block]:
                 if atom != second_atom:
@@ -1131,7 +1130,7 @@ class ModificationSystem(System):
             
     def get_proteolysis_fragments_within(self, queryweight, within_weight):
         """ returns only those fragments within the given range of molecular weights """
-        qw = string.atof(queryweight)
+        qw = float(queryweight)
         # count how many fragments are within the given tolerance
         within_count = 0
         for fragments_by_chain in self.frag_info_by_chain:
@@ -1147,7 +1146,7 @@ class ModificationSystem(System):
         # return a list of size return_count of the closest fragments
         if return_count == 0:        # an empty list
             return []
-        qw             = string.atof(queryweight)
+        qw             = float(queryweight)
         frag_index     = 0
         nearest_index  = 0
         furthest_saved_dist = 1000000000.0

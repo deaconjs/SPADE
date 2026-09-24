@@ -3,7 +3,6 @@ import os
 sys.path.append(os.getcwd())
 from MolecularComponents.classMolecule import Molecule
 from MolecularComponents.classFutamuraHash import FutamuraHash
-import string
 import parms
     
 class Polymer(Molecule):

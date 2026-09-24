@@ -1,5 +1,4 @@
 import math
-import string
 
 class FutamuraHash:
     def __init__(self, mol, outside_barrier=4.0, grid_spacing=4*1.4, alpha_carbon_code=0, core_cutoff=5, neighbor_thresh=3):
@@ -99,8 +98,8 @@ class FutamuraHash:
 
     def get_grid_blocks_to_search(self, atom_number):
         block = self.atom_block_assignments['%s'%(atom_number)]
-        key_tokens = string.split(block)
-        keys = [string.atoi(key_tokens[0]), string.atoi(key_tokens[1]), string.atoi(key_tokens[2])]
+        key_tokens = block.split()
+        keys = [int(key_tokens[0]), int(key_tokens[1]), int(key_tokens[2])]
         start_array = [0,0,0]
         end_array   = [0,0,0]
         # figure out starts and ends

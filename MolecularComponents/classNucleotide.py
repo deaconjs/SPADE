@@ -3,7 +3,6 @@ import os
 sys.path.append(os.getcwd())
 from MolecularComponents.classMolecule import Molecule
 from MolecularComponents.classPoint import Point
-import string
 
 class Nucleotide(Molecule):
     def __init__(self, PDBlines, parent, atoms):
@@ -13,8 +12,8 @@ class Nucleotide(Molecule):
         for atom in atoms:
             atom.parent = self
         line = PDBlines[0]
-        self.res_type1  = string.strip(line[17:20])
-        self.res_number = string.atoi(line[23:26])
+        self.res_type1  = line[17:20].strip()
+        self.res_number = int(line[23:26])
 
         self.is_Nterm = 0
         self.is_Cterm = 0

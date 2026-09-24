@@ -1,5 +1,4 @@
 import re
-import string
 
 """
  Read the protonation information from the data file
@@ -12,9 +11,9 @@ def read_protonation_info (protonFile):
     # Format of a protonation line is:
     # AA Name,D,DD1,DD2,DDD1,DDD2,Hybridization,Bonds,D-H distance,Angles
     for line in fproton:
-        line = string.strip (line)
+        line = line.strip()
         if (not comment_pat.search (line) and line != ''):
-            fields=string.split (line,",")
+            fields=line.split(",")
             protonInfo={}
             protonInfo['aminoAcidName']=fields[0]
             protonInfo['atomName']=fields[1]
@@ -24,7 +23,7 @@ def read_protonation_info (protonFile):
             protonInfo['DDD2Name']=fields[5]
             protonInfo['hyb']=fields[6]
             protonInfo['bonds']=fields[7]
-            protonInfo['D-H']=string.atof(fields[8])
+            protonInfo['D-H']=float(fields[8])
             protonInfo['angles']=fields[9]
             protonsInfo.append (protonInfo)
     fproton.close()
@@ -62,9 +61,9 @@ def read_donor_info (donorFile):
     # Format of a donor line is:
     # AA Donor Name, Donor Atom Name
     for line in fdonor:
-        line = string.strip (line)
+        line = line.strip()
         if (not comment_pat.search (line) and line != ''):
-            fields=string.split (line,",")
+            fields=line.split(",")
             donorInfo={}
             donorInfo['aminoAcidName']=fields[0]
             donorInfo['atomName']=fields[1]
@@ -93,9 +92,9 @@ def read_acc_info (accFile):
     # Format of a acceptor line is:
     # Amino Acid Name, A, AA
     for line in facc:
-        line = string.strip (line)
+        line = line.strip()
         if (not comment_pat.search (line) and line != ''):
-            fields=string.split (line,",")
+            fields=line.split(",")
             accInfo={}
             accInfo['aminoAcidName']=fields[0]
             accInfo['atomName']=fields[1]

@@ -5,29 +5,27 @@ import copy
 import math
 import time
 import random
-import string
 from sys import argv         
 
 # dependency imports
 from tkinter import *
 from tkinter import filedialog
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 import vtk
-import pyvista
-import vtk.tk.vtkTkRenderWidget
-from vtk.tk.vtkTkRenderWindowInteractor import vtkTkRenderWindowInteractor
 import Pmw
 
 # internal imports
 import MolecularSystem
 import parms
 import SystemMemory
+from Widgets import TkVTKWidget
 
 # tool imports
-import SPADE
-import Tools.DetectDomains
-import Tools.Selection.SystemSelectionDialog
-import Tools.Aligner.SequenceAligner
-import Tools.ConservationTools
+# SPADE and DetectDomains are imported where they are used, so the viewer can
+# run standalone without loading the full SPADE application
+from Tools.Selection import SystemSelectionDialog
+from Tools.Aligner import SequenceAligner
+from Tools.ConservationTools import ConservationTools
 from MolecularComponents.classFutamuraHash import FutamuraHash 
 
 verbose = 0
@@ -45,9 +43,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
         if menu == 1:
             self.has_menu = 1
             self._build_menu()
-        self.screen = pyvista.Plotter(window_size=(wd, ht))
-        win = self.screen.render_window
-        #self.screen = vtk.tk.vtkTkRenderWidget.vtkTkRenderWidget(parent, width=wd, height=ht)
+        self.screen = TkVTKWidget.create_render_widget(parent, width=wd, height=ht)
         # these look interesting, but I didn't see any difference with them
         #win.PointSmoothingOn()
         #win.LineSmoothingOn()
@@ -59,24 +55,20 @@ class MolecularViewer(Frame):             # Molecular Viewer
         #
         self.renderer = vtk.vtkRenderer()
         self.renderer.GetActiveCamera().GlobalWarningDisplayOff()
-        self.screen.render_window.AddRenderer(self.renderer)
+        self.screen.GetRenderWindow().AddRenderer(self.renderer)
         self.menuBar.pack(fill='x', side='top', expand=NO)
-        #self.screen.pack(side=TOP, expand=YES, fill=BOTH)
-        self.interactor = vtkTkRenderWindowInteractor(self, rw=self.screen.render_window, width=wd, height=ht)
-        self.interactor.Initialize()
-        self.interactor.pack(side=TOP, expand=YES, fill=BOTH)
-        self.interactor.Start()
+        self.screen.pack(side=TOP, expand=YES, fill=BOTH)
         self.busy_label.pack(side=TOP, anchor=W, expand=NO)
-        start_time = time.clock()
+        start_time = time.perf_counter()
         self.visitor = GraphicsVisitor(None, self)
         self.renderer.ResetCamera()
-        self.screen.render()
+        self.screen.Render()
         #self._set_lights()
         if self.undoredo_toggle:
             if self.system and self.system != 'None':
                 self.graphics_memories = [SystemMemory.GraphicsMemory(self.system)]
                 self.selection_memories = [SystemMemory.SelectionMemory(self.system)]
-        end_time = time.clock()
+        end_time = time.perf_counter()
         self.graphics_memories = []
         self.selection_memories = []
         self.graphics_memory_index = 0
@@ -164,7 +156,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
     def update_view(self, graphics_state=None):
         if graphics_state:
             graphics_state.restore_system()
-        start_time = time.clock()
+        start_time = time.perf_counter()
         self.busy_text.set('Busy')
         self.busy_label.update()
         last_selection_memory = self.selection_memories[self.selection_memory_index]
@@ -181,7 +173,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
             self.graphics_memory_index += 1
             self.selection_memory_index += 1
         self.screen.Render()
-        end_time = time.clock()
+        end_time = time.perf_counter()
         self.busy_text.set('Ready')
         self.busy_label.update()
 
@@ -294,7 +286,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
         
     def toggle_hydrogens(self):
         self.visitor.toggle_hydrogens()
-        viewer.update_view()
+        self.update_view()
         
     def toggle_background(self):
         if self.white_background:
@@ -414,6 +406,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
 
     def toggle_codebox(self):
         if self.cb == None:
+            import SPADE
             self.cb = SPADE.CodeBox(self.parent, self.system, self)
             sys.stdout = self.cb
             sys.stderr = self.cb
@@ -860,12 +853,12 @@ class MolecularViewer(Frame):             # Molecular Viewer
                                                                                       ("TIFF", "*.tif"),
                                                                                       ("all files", "*")])
         if len(strg) > 0:
-            tokens = string.split(strg, '.')
+            tokens = strg.split('.')
             if tokens[-1] == "jpg":
                 w2i = vtk.vtkWindowToImageFilter()
                 w2i.SetInput(self.screen.GetRenderWindow())
                 writer = vtk.vtkJPEGWriter()
-                writer.SetInput(w2i.GetOutput())
+                writer.SetInputConnection(w2i.GetOutputPort())
                 writer.SetFileName(strg)
                 writer.Write()
     def toggle_axes(self):
@@ -898,7 +891,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
         w2i = vtk.vtkWindowToImageFilter()
         w2i.SetInput(self.screen.GetRenderWindow())
         writer = vtk.vtkJPEGWriter()
-        writer.SetInput(w2i.GetOutput())
+        writer.SetInputConnection(w2i.GetOutputPort())
         writer.SetFileName(icon_filename)
         writer.Write()
                 
@@ -934,6 +927,7 @@ class MolecularViewer(Frame):             # Molecular Viewer
         #fetcher = SequenceFetcher.SequenceFetcher(self.system)
         #fetcher.fetch()
         #fetcher.normalize_domain_labels()
+        from Tools.DetectDomains import DetectDomains
         for pchain in self.system.ProteinList:
             DetectDomains.auto_decompose(pchain, self)
         self.rebuild_color_menu()
@@ -1408,7 +1402,6 @@ class GraphicsVisitor:
                 color = res.vtk_arg_list['trace']['color']
                 res.visible = 1
                 opacity = res.vtk_arg_list['trace']['opacity']
-            if opacity != 1.0:
                 luTable.SetTableValue(index, color[0], color[1], color[2], opacity)
             else:
                 luTable.SetTableValue(index, 1.0,1.0,1.0,1.0)
@@ -1477,15 +1470,15 @@ class GraphicsVisitor:
             sphere.SetRadius(radii.get(atom.atom_type[0], default_distance))
             sphere.SetThetaResolution(8)
             sphere.SetPhiResolution(8)
+            sphere.Update()
             x = sphere.GetOutput()
-            x.Update()
             sphere_points = x.GetPoints()
             for point_index in range(sphere_points.GetNumberOfPoints()):
                 scalars.InsertTuple1(i, number_index_map[atom.atom_number])            
                 i = i + 1
-            spheres.AddInput(x)
+            spheres.AddInputData(x)
+        spheres.Update()
         x = spheres.GetOutput()
-        x.Update()
         x.GetPointData().SetScalars(scalars)
         
         if i > 0:               
@@ -1493,7 +1486,7 @@ class GraphicsVisitor:
             
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(x)
+            mapper.SetInputData(x)
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1502,7 +1495,7 @@ class GraphicsVisitor:
             actor.SetMapper(mapper)
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(x)
+            mapper.SetInputData(x)
             actor.SetMapper(mapper)
         return actor
 
@@ -1563,7 +1556,7 @@ class GraphicsVisitor:
             
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(bond_line_profile)
+            mapper.SetInputData(bond_line_profile)
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1572,7 +1565,7 @@ class GraphicsVisitor:
             actor.SetMapper(mapper)
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(bond_line_profile)
+            mapper.SetInputData(bond_line_profile)
             actor.SetMapper(mapper)
         return actor
 
@@ -1612,7 +1605,7 @@ class GraphicsVisitor:
             
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(bond_line_profile)
+            mapper.SetInputData(bond_line_profile)
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1621,7 +1614,7 @@ class GraphicsVisitor:
             actor.SetMapper(mapper)
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(bond_line_profile)
+            mapper.SetInputData(bond_line_profile)
             actor.SetMapper(mapper)
         return actor
         
@@ -1659,14 +1652,14 @@ class GraphicsVisitor:
         if points_count > 0:               
             profileTubes = vtk.vtkTubeFilter()
             profileTubes.SetNumberOfSides(system.vtk_arg_list['hbonds']['sides'])
-            profileTubes.SetInput(hbond_line_profile)
+            profileTubes.SetInputData(hbond_line_profile)
             profileTubes.SetRadius(system.vtk_arg_list['hbonds']['width'])
 
             luTable = self._build_hbonds_lookup_table(system)
             
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(profileTubes.GetOutput())
+            mapper.SetInputConnection(profileTubes.GetOutputPort())
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1675,7 +1668,7 @@ class GraphicsVisitor:
             actor.SetMapper(mapper)
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(hbond_line_profile)
+            mapper.SetInputData(hbond_line_profile)
             actor.SetMapper(mapper)
         return actor
         
@@ -1721,14 +1714,14 @@ class GraphicsVisitor:
         if points_count > 0:               
             profileTubes = vtk.vtkTubeFilter()
             profileTubes.SetNumberOfSides(molecule.vtk_arg_list['atoms']['sticks_sides'])
-            profileTubes.SetInput(bond_line_profile)
+            profileTubes.SetInputData(bond_line_profile)
             profileTubes.SetRadius(molecule.vtk_arg_list['atoms']['sticks_width'])
 
             luTable = self._build_atom_lookup_table(molecule)
             
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(profileTubes.GetOutput())
+            mapper.SetInputConnection(profileTubes.GetOutputPort())
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1737,7 +1730,7 @@ class GraphicsVisitor:
             actor.SetMapper(mapper)
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(bond_line_profile)
+            mapper.SetInputData(bond_line_profile)
             actor.SetMapper(mapper)
         return actor
         
@@ -1759,7 +1752,7 @@ class GraphicsVisitor:
             luTable = self._build_tubes_lookup_table(polymer)
             mapper = vtk.vtkPolyDataMapper()
             mapper.SetLookupTable(luTable)
-            mapper.SetInput(data)
+            mapper.SetInputData(data)
             mapper.ScalarVisibilityOn()
             mapper.SetScalarModeToUsePointData()
             mapper.SetColorModeToMapScalars()
@@ -1767,7 +1760,7 @@ class GraphicsVisitor:
             mapper.SetScalarRange(0,len(polymer.residues))
         else:
             mapper = vtk.vtkPolyDataMapper()
-            mapper.SetInput(data)
+            mapper.SetInputData(data)
         
         actor.SetMapper(mapper)
         return actor
@@ -1789,19 +1782,19 @@ class GraphicsVisitor:
         if scalars.GetNumberOfTuples() > 0:
             profileTubes = vtk.vtkRibbonFilter()
             #profileTubes.SetNumberOfSides(polymer.vtk_arg_list['trace']['sides'])
-            profileTubes.SetInput(profileData)
+            profileTubes.SetInputData(profileData)
             #profileTubes.SetRadius(polymer.vtk_arg_list['trace']['width'])
             
             # not sure why this was here, but it causes crashes now.
             #normals = vtk.vtkPolyDataNormals()
-            #normals.SetInput(profileTubes.GetOutput())
+            #normals.SetInputConnection(profileTubes.GetOutputPort())
             #normals.FlipNormalsOn()
 
             luTable = self._build_tubes_lookup_table(polymer)
         
             profileMapper = vtk.vtkPolyDataMapper()
             profileMapper.SetLookupTable(luTable)
-            profileMapper.SetInput(profileTubes.GetOutput())
+            profileMapper.SetInputConnection(profileTubes.GetOutputPort())
             #profileMapper.ScalarVisibilityOn()
             #profileMapper.SetScalarModeToUsePointData()
             #profileMapper.SetColorModeToMapScalars()
@@ -1809,7 +1802,7 @@ class GraphicsVisitor:
             profileMapper.SetScalarRange(0,len(polymer.residues))
         else:
             profileMapper = vtk.vtkPolyDataMapper()
-            profileMapper.SetInput(profileData)
+            profileMapper.SetInputData(profileData)
         
         actor.SetMapper(profileMapper)
         return actor
@@ -1830,12 +1823,12 @@ class GraphicsVisitor:
         if scalars.GetNumberOfTuples() > 0:
             profileTubes = vtk.vtkTubeFilter()
             profileTubes.SetNumberOfSides(polymer.vtk_arg_list['trace']['sides'])
-            profileTubes.SetInput(profileData)
+            profileTubes.SetInputData(profileData)
             profileTubes.SetRadius(polymer.vtk_arg_list['trace']['width'])
             
             # don't know why I had this here, but it causes crashes now for some reason
             #normals = vtk.vtkPolyDataNormals()
-            #normals.SetInput(profileTubes.GetOutput())
+            #normals.SetInputConnection(profileTubes.GetOutputPort())
             #normals.FlipNormalsOn()
             #normals.Update()
 
@@ -1843,7 +1836,7 @@ class GraphicsVisitor:
             
             profileMapper = vtk.vtkPolyDataMapper()
             profileMapper.SetLookupTable(luTable)
-            profileMapper.SetInput(profileTubes.GetOutput())
+            profileMapper.SetInputConnection(profileTubes.GetOutputPort())
             profileMapper.ScalarVisibilityOn()
             profileMapper.SetScalarModeToUsePointData()
             profileMapper.SetColorModeToMapScalars()
@@ -1853,7 +1846,7 @@ class GraphicsVisitor:
 
         else:
             profileMapper = vtk.vtkPolyDataMapper()
-            profileMapper.SetInput(profileData)
+            profileMapper.SetInputData(profileData)
 
         actor.SetMapper(profileMapper)
         return actor
@@ -1892,7 +1885,17 @@ class GraphicsVisitor:
                 ptrcollection.append(ptcntr)
                 scalars.InsertTuple1(ptcntr, index)
             index = index + 1
-            
+        # chain breaks leave point ids that no line uses. VTK leaves those slots
+        # uninitialized, and the garbage values corrupt line-mode rendering, so fill them.
+        used_ids = set(ptrcollection)
+        for ptcntr in range(points.GetNumberOfPoints()):
+            if ptcntr not in used_ids:
+                t = frac*ptcntr
+                points.InsertPoint(ptcntr, self.polymer_splines[polymer.chain_name]['x'].Evaluate(t),
+                                           self.polymer_splines[polymer.chain_name]['y'].Evaluate(t),
+                                           self.polymer_splines[polymer.chain_name]['z'].Evaluate(t))
+                scalars.InsertTuple1(ptcntr, 0)
+
         start = 0
         end = 0
         for i in range(len(ptrcollection)-1):
@@ -1954,11 +1957,11 @@ class GraphicsVisitor:
             reader.SetFileName(filename)
 
             rev = vtk.vtkReverseSense()
-            rev.SetInput(reader.GetOutput())
+            rev.SetInputConnection(reader.GetOutputPort())
             rev.ReverseCellsOff()
             
             normals = vtk.vtkPolyDataNormals()
-            normals.SetInput(rev.GetOutput())
+            normals.SetInputConnection(rev.GetOutputPort())
             normals.FlipNormalsOn()
             
             luTable = self._build_surface_lookup_table(mol)
@@ -1968,9 +1971,8 @@ class GraphicsVisitor:
             map.ScalarVisibilityOn()
             map.SetScalarModeToUsePointData()
             map.SetColorModeToMapScalars()
-            map.SetInput(normals.GetOutput())
+            map.SetInputConnection(normals.GetOutputPort())
             map.SetScalarRange(0,len(mol.atoms))
-            map.ImmediateModeRenderingOn()
 
             actor.SetMapper(map)
             self.renderer.AddActor(actor)
@@ -2217,22 +2219,22 @@ class GraphicsVisitor:
         theSurfaceMap.Update()
 
         theSurface = vtk.vtkContourFilter()
-        theSurface.SetInput(theSurfaceMap.GetOutput())
+        theSurface.SetInputConnection(theSurfaceMap.GetOutputPort())
         theSurface.SetValue(0,0.0)
 
         smoother = vtk.vtkWindowedSincPolyDataFilter()
-        smoother.SetInput(theSurface.GetOutput())
+        smoother.SetInputConnection(theSurface.GetOutputPort())
         smoother.SetNumberOfIterations(10)
 
         """
         decimate = vtk.vtkDecimatePro()
-        decimate.SetInput(theSurface.GetOutput())
+        decimate.SetInputConnection(theSurface.GetOutputPort())
         decimate.PreserveTopologyOn()
         decimate.SetTargetReduction(.2)
 
         """
+        smoother.Update()
         x = smoother.GetOutput()
-        x.Update()
 
         final_point_count = x.GetNumberOfPoints()
         final_points = []
@@ -2261,7 +2263,7 @@ class GraphicsVisitor:
         x.GetPointData().SetScalars(scalars)
 
         writer = vtk.vtkPolyDataWriter()
-        writer.SetInput(x)
+        writer.SetInputData(x)
         if self.hydrogens_on:
             writer.SetFileName(mol.parent.get_filename_by_extension('.hms', mol.key))   # spade molecular surface
         else:
@@ -2270,11 +2272,11 @@ class GraphicsVisitor:
         writer.Write()
 
         rev = vtk.vtkReverseSense()
-        rev.SetInput(x)
+        rev.SetInputData(x)
         rev.ReverseCellsOff()
         
         normals = vtk.vtkPolyDataNormals()
-        normals.SetInput(rev.GetOutput())
+        normals.SetInputConnection(rev.GetOutputPort())
         normals.FlipNormalsOn()
         
         map = vtk.vtkPolyDataMapper()
@@ -2282,9 +2284,8 @@ class GraphicsVisitor:
         map.ScalarVisibilityOn()
         map.SetScalarModeToUsePointData()
         map.SetColorModeToMapScalars()
-        map.SetInput(normals.GetOutput())
+        map.SetInputConnection(normals.GetOutputPort())
         map.SetScalarRange(0,len(mol.atoms))
-        map.ImmediateModeRenderingOn()
 
         volume_actor.GetProperty().SetSpecular(mol.vtk_arg_list['volume']['specular'])
         volume_actor.GetProperty().SetSpecularPower(mol.vtk_arg_list['volume']['specular_power'])
@@ -2330,7 +2331,7 @@ if __name__ == '__main__':
                 viewer.closeSystem()
                 viewer.loadSystem(new_system)
         else:
-            print("file {new_name} does not exist")
+            print(f"file {new_name} does not exist")
     
     viewer.menuBar.addmenu('File', 'Load/Unload systems')
     c_lambda = lambda viewer=viewer: reload_viewer(viewer, 'pdb')

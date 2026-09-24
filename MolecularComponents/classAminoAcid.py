@@ -5,7 +5,6 @@ sys.path.append(os.getcwd())
 from MolecularComponents.classMolecule import Molecule
 from MolecularComponents.classAtom import Atom
 from MolecularComponents.classPoint import Point
-import string
 import copy
 
 class AminoAcid(Molecule):
@@ -25,7 +24,7 @@ class AminoAcid(Molecule):
                  'SER':'S','THR':'T','VAL':'V','TRP':'W','TYR':'Y'}
         self.res_type1  = types[self.res_type]
         line = PDBlines[0]
-        self.res_number = string.atoi(line[23:26])
+        self.res_number = int(line[23:26])
         # store alpha carbon coordinates
         self.has_central_pt = 0
         self.atoms_dict = {}
@@ -91,7 +90,7 @@ class AminoAcid(Molecule):
         average_val = 0.0
         for atom in self.atoms:
             try:
-                average_val += string.atof(atom.features[feature])
+                average_val += float(atom.features[feature])
             except ValueError:
                 print(f"Feature {feature} is not a number for atom {atom.atom_num}")
                 return None
